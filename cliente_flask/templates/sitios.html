@@ -1,0 +1,17 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<h1 style="color: white; margin-bottom: 30px;">Información de Sitios</h1>
+<div class="card-grid">
+    {% for s in sitios %}
+    <div class="neon-box">
+        <h3 style="color: var(--neon-blue); margin-top: 0; font-size: 1.4rem;">{{ s.nombre }}</h3>
+        <div style="margin-top: 15px;">
+            <p style="margin: 5px 0;"><strong>📍 Ubicación:</strong> {{ s.ubicacion }}</p>
+            <p style="margin: 5px 0;"><strong>🏢 Tipo:</strong> {{ s.tipo }}</p>
+            <p style="margin: 5px 0;"><strong>👥 Capacidad:</strong> {{ s.capacidad }} personas</p>
+            <p style="margin: 5px 0; color: #4ade80;"><strong>🕒 Horario:</strong> {{ s.apertura }} - {{ s.cierre }} hrs.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

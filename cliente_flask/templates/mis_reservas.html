@@ -1,0 +1,21 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<h1 style="color: white; margin-bottom: 30px;">Historial de Reservas</h1>
+<div class="neon-box" style="padding: 0; overflow-x: auto;">
+    <table class="neon-table">
+        <thead>
+            <tr><th>Fecha</th><th>Horario</th><th>Espacio</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+            {% for r in reservas %}
+            <tr>
+                <td>{{ r.fecha }}</td><td>{{ r.horario }}</td><td>{{ r.espacio }}</td>
+                <td style="color: {% if r.estado == 'activa' %}#4ade80{% else %}#f87171{% endif %}; font-weight: bold;">
+                    {{ r.estado | upper }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

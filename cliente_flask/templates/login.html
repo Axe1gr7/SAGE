@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGE - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body style="justify-content: center; align-items: center;">
+    <div class="neon-box" style="width: 100%; max-width: 400px; text-align: center; border-color: var(--neon-blue);">
+        <h1 style="color: var(--neon-blue); letter-spacing: 3px;">SAGE</h1>
+        <p style="color: #94a3b8; margin-bottom: 30px;">Portal de Estudiantes</p>
+        
+        <form action="{{ url_for('dashboard') }}">
+            <input type="text" class="neon-input" placeholder="Matrícula" required>
+            <input type="password" class="neon-input" placeholder="Contraseña" required>
+            <button type="submit" class="btn-action-green" style="width: 100%; margin-top: 15px; padding: 12px;">INICIAR SESIÓN</button>
+        </form>
+        <p style="margin-top: 20px; font-size: 0.9rem;">¿No tienes cuenta? <a href="{{ url_for('registro') }}" style="color: var(--neon-blue);">Regístrate aquí</a></p>
+    </div>
+</body>
+</html>

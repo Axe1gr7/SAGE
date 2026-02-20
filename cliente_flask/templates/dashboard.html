@@ -1,0 +1,29 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    <h1 class="title-outline" style="font-size: 2rem; margin-bottom: 40px; color: var(--neon-blue);">PORTAL ESTUDIANTIL</h1>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 900px; margin: 0 auto;">
+        
+        <a href="{{ url_for('agendar') }}" class="neon-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; text-decoration: none; color: white;">
+            <span style="font-size: 2.5rem; margin-bottom: 10px;">📅</span>
+            <span style="font-size: 1.2rem; font-weight: 600; text-transform: uppercase;">Agendar Espacio</span>
+        </a>
+
+        <a href="{{ url_for('mis_reservas') }}" class="neon-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; text-decoration: none; color: white;">
+            <span style="font-size: 2.5rem; margin-bottom: 10px;">🕒</span>
+            <span style="font-size: 1.2rem; font-weight: 600; text-transform: uppercase;">Mis Reservas</span>
+        </a>
+
+        <a href="{{ url_for('eventos') }}" class="neon-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; text-decoration: none; color: white;">
+            <span style="font-size: 2.5rem; margin-bottom: 10px;">🎟️</span>
+            <span style="font-size: 1.2rem; font-weight: 600; text-transform: uppercase;">Eventos Universitarios</span>
+        </a>
+
+        <a href="{{ url_for('sitios') }}" class="neon-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; text-decoration: none; color: white;">
+            <span style="font-size: 2.5rem; margin-bottom: 10px;">📍</span>
+            <span style="font-size: 1.2rem; font-weight: 600; text-transform: uppercase;">Información de Sitios</span>
+        </a>
+
+    </div>
+{% endblock %}

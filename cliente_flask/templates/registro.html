@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGE - Registro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body style="justify-content: center; align-items: center;">
+    <div class="neon-box" style="width: 100%; max-width: 450px; text-align: center; border-color: #4ade80;">
+        <h2 style="color: #4ade80; margin-top: 0;">CREAR CUENTA</h2>
+        
+        <form action="{{ url_for('login') }}">
+            <input type="text" class="neon-input" placeholder="Nombre Completo" required>
+            <input type="text" class="neon-input" placeholder="Matrícula" required>
+            <input type="email" class="neon-input" placeholder="Correo Electrónico" required>
+            
+            <select class="neon-input" required>
+                <option value="" disabled selected>Selecciona tu Carrera</option>
+                <option value="sistemas">Sistemas</option>
+                <option value="mecatronica">Mecatrónica</option>
+                <option value="ingenieria de datos">Ingeniería de Datos</option>
+                <option value="automotriz">Automotriz</option>
+                <option value="negocios internacionales">Negocios Internacionales</option>
+                <option value="administracion">Administración</option>
+                <option value="manufactura">Manufactura</option>
+            </select>
+
+            <input type="password" class="neon-input" placeholder="Contraseña" required>
+            <button type="submit" class="btn-action-green" style="width: 100%; margin-top: 10px;">REGISTRARSE</button>
+        </form>
+        <p style="margin-top: 15px; font-size: 0.9rem;"><a href="{{ url_for('login') }}" style="color: var(--neon-blue);">Volver al Login</a></p>
+    </div>
+</body>
+</html>

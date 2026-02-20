@@ -1,0 +1,13 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<h1 style="color: white; margin-bottom: 30px;">Próximos Eventos</h1>
+<div class="card-grid">
+    {% for e in eventos %}
+    <div class="neon-box">
+        <h3 style="color: var(--neon-blue); margin-top: 0;">{{ e.nombre }}</h3>
+        <p style="color: #4ade80; font-size: 0.85rem;">📅 Inicio: {{ e.fecha_inicio }} <br> 🛑 Fin: {{ e.fecha_fin }}</p>
+        <p style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.5;">{{ e.descripcion }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
