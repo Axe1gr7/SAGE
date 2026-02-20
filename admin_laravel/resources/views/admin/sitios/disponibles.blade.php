@@ -1,0 +1,160 @@
+@extends('layouts.app')
+
+@section('content')
+    <div style="padding: 20px;">
+        <h1 class="title-outline">MAPA DE ESPACIOS</h1>
+        
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <select id="select-espacio" class="neon-input" style="width: 250px; font-weight: bold; margin: 0;" onchange="actualizarHorariosEspacio()">
+                <option value="1" data-apertura="07:00" data-cierre="22:00">LABORATORIO A1 (07:00 - 22:00)</option>
+                <option value="2" data-apertura="08:00" data-cierre="16:00">LABORATORIO A2 (08:00 - 16:00)</option>
+            </select>
+            <input type="date" class="neon-input" style="width: 200px; color-scheme: dark; margin: 0;">
+        </div>
+
+        <div style="display: flex; gap: 30px;">
+            <div class="neon-box" style="flex-grow: 1; padding: 20px;">
+                <div style="background: rgba(123, 162, 248, 0.1); text-align: center; padding: 15px; margin-bottom: 20px; font-weight: 600; border: 1px dashed var(--neon-blue); border-radius: 8px; color: var(--neon-blue);">
+                    PIZARRÓN / FRENTE
+                </div>
+
+                <div class="lab-grid">
+                    <div class="pc-node occupied">PC-01</div>
+                    <div class="pc-node available" onclick="seleccionarAsiento(this, 'PC-02')">PC-02</div>
+                    <div class="pc-node available" onclick="seleccionarAsiento(this, 'PC-03')">PC-03</div>
+                    <div class="pc-node occupied">PC-04</div>
+                    <div class="pc-node available" onclick="seleccionarAsiento(this, 'PC-05')">PC-05</div>
+                    
+                    <div class="pc-node available" onclick="seleccionarAsiento(this, 'PC-06')">PC-06</div>
+                    <div class="pc-node available" onclick="seleccionarAsiento(this, 'PC-07')">PC-07</div>
+                    <div class="pc-node available" onclick="seleccionarAsiento(this, 'PC-08')">PC-08</div>
+                    <div class="pc-node occupied">PC-09</div>
+                    <div class="pc-node occupied">PC-10</div>
+                </div>
+            </div>
+
+            <div class="neon-box" style="width: 200px; padding: 20px; height: fit-content;">
+                <h3 style="margin-top: 0; color: white;">Estado</h3>
+                <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #4ade80; font-size: 1.5rem;">■</span> Disponible
+                </div>
+                <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #f87171; font-size: 1.5rem;">■</span> Ocupado
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: var(--neon-blue); font-size: 1.5rem;">■</span> Seleccionado
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalReserva" class="modal-overlay">
+        <div class="modal-content" style="border-color: #4ade80; box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);">
+            <h2 style="color: #4ade80; margin-top: 0;">Confirmar Reserva</h2>
+            <p style="color: #94a3b8;">Equipo seleccionado: <strong id="equipoSelec" style="color: var(--neon-blue); font-size: 1.2rem;"></strong></p>
+            <p style="color: #4ade80; font-size: 0.85rem;" id="info-horario"></p>
+            
+            <form action="#" method="POST">
+                @csrf
+                <input type="hidden" name="id_espacio" id="id_espacio_input" value="1">
+                
+                <label style="color: #94a3b8; font-size: 0.9rem;">Tipo de Reserva:</label>
+                <select name="tipo_reserva" id="tipo_reserva" class="neon-input" onchange="cambiarTipoReserva()" required>
+                    <option value="">Selecciona...</option>
+                    <option value="estudiante">Individual (Estudiante)</option>
+                    <option value="clase">Clase Programada</option>
+                    <option value="evento">Evento Especial</option>
+                </select>
+
+                <div id="contenedor-referencia" style="display: none;">
+                    <label id="label-referencia" style="color: #94a3b8; font-size: 0.9rem;"></label>
+                    <select name="id_referencia" id="select-referencia" class="neon-input" required></select>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 25px; margin-top: 10px;">
+                    <div style="flex: 1;">
+                        <label style="color: #94a3b8; font-size: 0.9rem;">Fecha/Hora Inicio:</label>
+                        <input type="datetime-local" id="hora_inicio" name="fecha_hora_inicio" class="neon-input" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="color: #94a3b8; font-size: 0.9rem;">Fecha/Hora Fin:</label>
+                        <input type="datetime-local" id="hora_fin" name="fecha_hora_fin" class="neon-input" required>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between;">
+                    <button type="button" class="btn-outline" onclick="cerrarReserva()">Cancelar</button>
+                    <button type="submit" class="btn-action-green">Agendar Equipo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let ultimoAsiento = null;
+
+        // Base de datos simulada para los selectores dinámicos
+        const dbListas = {
+            'estudiante': [{id: 1, texto: '1220432 - Ana López'}],
+            'clase': [{id: 1, texto: 'Base de Datos - S101 (Prof. Roberto)'}],
+            'evento': [{id: 1, texto: 'Hackathon 2026'}]
+        };
+
+        function seleccionarAsiento(elemento, idEquipo) {
+            if (elemento.classList.contains('occupied')) return;
+            if (ultimoAsiento) ultimoAsiento.classList.remove('selected');
+            
+            elemento.classList.add('selected');
+            ultimoAsiento = elemento;
+            
+            document.getElementById('equipoSelec').innerText = idEquipo;
+            
+            // Actualizar hidden input e info de horarios
+            const selectEspacio = document.getElementById('select-espacio');
+            document.getElementById('id_espacio_input').value = selectEspacio.value;
+            actualizarHorariosEspacio();
+
+            document.getElementById('modalReserva').style.display = 'flex';
+        }
+
+        function actualizarHorariosEspacio() {
+            const select = document.getElementById('select-espacio');
+            const apertura = select.options[select.selectedIndex].getAttribute('data-apertura');
+            const cierre = select.options[select.selectedIndex].getAttribute('data-cierre');
+            
+            const info = document.getElementById('info-horario');
+            if (info) info.innerText = `Horarios del sitio: ${apertura} a ${cierre} hrs.`;
+        }
+
+        function cambiarTipoReserva() {
+            const tipo = document.getElementById('tipo_reserva').value;
+            const contenedor = document.getElementById('contenedor-referencia');
+            const select = document.getElementById('select-referencia');
+            const label = document.getElementById('label-referencia');
+
+            if(tipo) {
+                contenedor.style.display = 'block';
+                label.innerText = `Selecciona el ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}:`;
+                
+                select.innerHTML = '<option value="">Selecciona una opción...</option>';
+                dbListas[tipo].forEach(item => {
+                    select.innerHTML += `<option value="${item.id}">${item.texto}</option>`;
+                });
+            } else {
+                contenedor.style.display = 'none';
+                select.innerHTML = '';
+            }
+        }
+
+        function cerrarReserva() {
+            document.getElementById('modalReserva').style.display = 'none';
+            if (ultimoAsiento) ultimoAsiento.classList.remove('selected');
+            ultimoAsiento = null;
+        }
+
+        // Inicializar texto de horarios al cargar
+        window.onload = function() {
+            actualizarHorariosEspacio();
+        };
+    </script>
+@endsection
