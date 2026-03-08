@@ -1,21 +1,49 @@
-{% extends 'layouts/base.html' %}
+{% extends 'base.html' %}
+
 {% block content %}
-<h1 style="color: white; margin-bottom: 30px;">Historial de Reservas</h1>
-<div class="neon-box" style="padding: 0; overflow-x: auto;">
-    <table class="neon-table">
+<h1 class="title-outline" style="color: #7ba2f8; font-family: 'Orbitron', sans-serif; margin-bottom: 30px; text-shadow: 0 0 10px rgba(123, 162, 248, 0.4);">
+    HISTORIAL DE RESERVAS
+</h1>
+
+<div class="neon-box" style="padding: 10px; overflow-x: auto; background: rgba(17, 24, 39, 0.8); border: 1px solid #7ba2f8; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
+    <table class="neon-table" style="width: 100%; border-collapse: collapse; color: #e2e8f0; text-align: left;">
         <thead>
-            <tr><th>Fecha</th><th>Horario</th><th>Espacio</th><th>Estado</th></tr>
+            <tr style="border-bottom: 2px solid #7ba2f8; font-family: 'Orbitron'; font-size: 0.85rem; color: #7ba2f8;">
+                <th style="padding: 15px;">FECHA</th>
+                <th style="padding: 15px;">HORARIO</th>
+                <th style="padding: 15px;">ESPACIO</th>
+                <th style="padding: 15px;">ESTADO</th>
+            </tr>
         </thead>
         <tbody>
-            {% for r in reservas %}
-            <tr>
-                <td>{{ r.fecha }}</td><td>{{ r.horario }}</td><td>{{ r.espacio }}</td>
-                <td style="color: {% if r.estado == 'activa' %}#4ade80{% else %}#f87171{% endif %}; font-weight: bold;">
-                    {{ r.estado | upper }}
-                </td>
-            </tr>
-            {% endfor %}
+            {% if reservas %}
+                {% for r in reservas %}
+                <tr style="border-bottom: 1px solid rgba(123, 162, 248, 0.1); transition: 0.3s;">
+                    <td style="padding: 15px;">{{ r.fecha }}</td>
+                    <td style="padding: 15px;">{{ r.horario }}</td>
+                    <td style="padding: 15px;">{{ r.espacio }}</td>
+                    <td style="padding: 15px; font-weight: bold; color: {% if r.estado == 'activa' %}#4ade80{% else %}#f87171{% endif %};">
+                        <span style="display: inline-block; padding: 4px 8px; border: 1px solid currentColor; border-radius: 4px; font-size: 0.75rem;">
+                            {{ r.estado | upper }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4" style="padding: 40px; text-align: center; color: #94a3b8; font-style: italic;">
+                        No tienes reservas registradas actualmente.
+                    </td>
+                </tr>
+            {% endif %}
         </tbody>
     </table>
 </div>
+
+<style>
+    tbody tr:hover {
+        background: rgba(123, 162, 248, 0.05);
+        color: white;
+    }
+</style>
 {% endblock %}

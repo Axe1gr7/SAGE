@@ -1,17 +1,48 @@
-{% extends 'layouts/base.html' %}
+{% extends 'base.html' %}
+
 {% block content %}
-<h1 style="color: white; margin-bottom: 30px;">Información de Sitios</h1>
-<div class="card-grid">
-    {% for s in sitios %}
-    <div class="neon-box">
-        <h3 style="color: var(--neon-blue); margin-top: 0; font-size: 1.4rem;">{{ s.nombre }}</h3>
-        <div style="margin-top: 15px;">
-            <p style="margin: 5px 0;"><strong>📍 Ubicación:</strong> {{ s.ubicacion }}</p>
-            <p style="margin: 5px 0;"><strong>🏢 Tipo:</strong> {{ s.tipo }}</p>
-            <p style="margin: 5px 0;"><strong>👥 Capacidad:</strong> {{ s.capacidad }} personas</p>
-            <p style="margin: 5px 0; color: #4ade80;"><strong>🕒 Horario:</strong> {{ s.apertura }} - {{ s.cierre }} hrs.</p>
+<h1 class="title-outline" style="color: #7ba2f8; font-family: 'Orbitron', sans-serif; margin-bottom: 40px; text-shadow: 0 0 10px rgba(123, 162, 248, 0.4);">
+    INFORMACIÓN DE SITIOS
+</h1>
+
+<div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+    {% if sitios %}
+        {% for s in sitios %}
+        <div class="neon-box" style="background: rgba(17, 24, 39, 0.8); border: 1px solid #7ba2f8; padding: 25px; border-radius: 15px; transition: 0.3s; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; right: 0; background: #7ba2f8; color: #0b101a; padding: 5px 15px; font-size: 0.7rem; font-weight: bold; font-family: 'Orbitron'; border-bottom-left-radius: 10px; text-transform: uppercase;">
+                {{ s.tipo }}
+            </div>
+
+            <h3 style="color: #7ba2f8; margin-top: 10px; font-size: 1.4rem; font-family: 'Orbitron'; letter-spacing: 1px;">
+                {{ s.nombre }}
+            </h3>
+            
+            <div style="margin-top: 20px; border-top: 1px solid rgba(123, 162, 248, 0.2); padding-top: 15px; font-size: 0.95rem; color: #e2e8f0; line-height: 1.8;">
+                <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #7ba2f8;">📍</span> <strong>Ubicación:</strong> {{ s.ubicacion }}
+                </p>
+                <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #7ba2f8;">👥</span> <strong>Capacidad:</strong> {{ s.capacidad }} personas
+                </p>
+                <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px; color: #4ade80; background: rgba(74, 222, 128, 0.1); padding: 5px 10px; border-radius: 5px; width: fit-content;">
+                    <span>🕒</span> <strong>Horario:</strong> {{ s.apertura }} - {{ s.cierre }} hrs.
+                </p>
+            </div>
         </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
+    {% else %}
+        <div class="neon-box" style="grid-column: 1 / -1; text-align: center; padding: 50px; border-style: dashed; opacity: 0.6;">
+            <span style="font-size: 3rem; display: block; margin-bottom: 20px;">🗺️</span>
+            <p style="color: #94a3b8; font-family: 'Orbitron';">No hay información de sitios disponible en este momento.</p>
+        </div>
+    {% endif %}
 </div>
+
+<style>
+    .neon-box:hover {
+        transform: scale(1.02);
+        border-color: #4ade80 !important;
+        box-shadow: 0 0 25px rgba(123, 162, 248, 0.3) !important;
+    }
+</style>
 {% endblock %}

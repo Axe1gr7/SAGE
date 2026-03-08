@@ -1,13 +1,44 @@
-{% extends 'layouts/base.html' %}
+{% extends 'base.html' %}
+
 {% block content %}
-<h1 style="color: white; margin-bottom: 30px;">Próximos Eventos</h1>
-<div class="card-grid">
-    {% for e in eventos %}
-    <div class="neon-box">
-        <h3 style="color: var(--neon-blue); margin-top: 0;">{{ e.nombre }}</h3>
-        <p style="color: #4ade80; font-size: 0.85rem;">📅 Inicio: {{ e.fecha_inicio }} <br> 🛑 Fin: {{ e.fecha_fin }}</p>
-        <p style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.5;">{{ e.descripcion }}</p>
-    </div>
-    {% endfor %}
+<h1 class="title-outline" style="color: #7ba2f8; font-family: 'Orbitron', sans-serif; margin-bottom: 30px; text-shadow: 0 0 10px rgba(123, 162, 248, 0.4);">
+    PRÓXIMOS EVENTOS
+</h1>
+
+<div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+    {% if eventos %}
+        {% for e in eventos %}
+        <div class="neon-box" style="background: rgba(17, 24, 39, 0.8); border: 1px solid #7ba2f8; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);">
+            <h3 style="color: #7ba2f8; font-family: 'Orbitron'; margin-top: 0; letter-spacing: 1px;">{{ e.nombre }}</h3>
+            
+            <div style="background: rgba(74, 222, 128, 0.1); border-left: 3px solid #4ade80; padding: 10px; margin-bottom: 15px;">
+                <p style="color: #4ade80; font-size: 0.85rem; margin: 0;">
+                    <strong>📅 Inicio:</strong> {{ e.fecha_inicio }}
+                </p>
+                <p style="color: #f87171; font-size: 0.85rem; margin: 5px 0 0 0;">
+                    <strong>🛑 Fin:</strong> {{ e.fecha_fin }}
+                </p>
+            </div>
+
+            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-bottom: 0;">
+                {{ e.descripcion }}
+            </p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="neon-box" style="grid-column: 1 / -1; text-align: center; padding: 40px; border-style: dashed; opacity: 0.7;">
+            <span style="font-size: 3rem; display: block; margin-bottom: 15px;">🎟️</span>
+            <p style="color: #94a3b8; font-family: 'Orbitron';">No hay eventos programados por el momento.</p>
+        </div>
+    {% endif %}
 </div>
+
+<style>
+    .neon-box:hover {
+        border-color: #4ade80 !important;
+        box-shadow: 0 0 20px rgba(74, 222, 128, 0.2) !important;
+        transform: translateY(-3px);
+        transition: 0.3s ease;
+    }
+</style>
 {% endblock %}

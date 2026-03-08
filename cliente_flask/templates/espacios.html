@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="title-outline" style="color: #7ba2f8; font-family: 'Orbitron', sans-serif; margin-bottom: 40px; text-shadow: 0 0 10px rgba(123, 162, 248, 0.4);">
+    GESTIÓN Y DETALLE DE ESPACIOS
+</h1>
+
+<div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px;">
+    {% if espacios %}
+        {% for esp in espacios %}
+        <div class="neon-box" style="background: rgba(17, 24, 39, 0.8); border: 1px solid #7ba2f8; border-radius: 15px; padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+            
+            <div style="background: rgba(123, 162, 248, 0.1); padding: 15px; border-bottom: 1px solid rgba(123, 162, 248, 0.3); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="color: #7ba2f8; margin: 0; font-family: 'Orbitron'; font-size: 1.1rem;">{{ esp.nombre }}</h3>
+                <span style="color: #4ade80; font-size: 0.8rem; font-family: 'Orbitron';">ID: ESP-0{{ loop.index }}</span>
+            </div>
+
+            <div style="padding: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Especificaciones Técnicas:</p>
+                    <ul style="list-style: none; padding: 0; margin: 0; color: #e2e8f0; font-size: 0.9rem;">
+                        <li style="margin-bottom: 8px;">💻 <strong>Equipos:</strong> {{ esp.cantidad_pcs }} Estaciones de trabajo</li>
+                        <li style="margin-bottom: 8px;">⚙️ <strong>Software:</strong> {{ esp.software_base }}</li>
+                        <li style="margin-bottom: 8px;">📡 <strong>Red:</strong> {{ esp.conexion }}</li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(148, 163, 184, 0.1);">
+                    <div>
+                        <span style="display: block; color: #94a3b8; font-size: 0.75rem;">Disponibilidad:</span>
+                        <strong style="color: {% if esp.disponible %}#4ade80{% else %}#f87171{% endif %};">
+                            {% if esp.disponible %}● OPERATIVO{% else %}● EN MANTENIMIENTO{% endif %}
+                        </strong>
+                    </div>
+                    <a href="{{ url_for('agendar') }}" class="btn-action-green" style="padding: 8px 15px; font-size: 0.8rem; text-decoration: none; border-radius: 5px; background: #10b981; color: white; font-family: 'Orbitron';">
+                        VER MAPA
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="neon-box" style="grid-column: 1 / -1; text-align: center; padding: 50px; border-style: dashed; opacity: 0.6;">
+            <p style="color: #94a3b8; font-family: 'Orbitron';">No se han definido detalles técnicos de espacios.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .neon-box {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .neon-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 20px rgba(123, 162, 248, 0.2);
+        border-color: #4ade80;
+    }
+</style>
+{% endblock %}

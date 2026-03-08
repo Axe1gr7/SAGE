@@ -58,7 +58,6 @@ body {
     transition: 0.3s;
 }
 
-/* Agregado para el estado activo/inactivo de las pestañas respetando tu estilo */
 .capsule-btn.active {
     background-color: var(--neon-blue);
     color: var(--bg-dark);
@@ -91,7 +90,6 @@ body {
     color: #94a3b8;
 }
 
-/* Sidebar Estilos */
 .sidebar {
     position: fixed;
     top: 0;
@@ -120,10 +118,6 @@ body {
     background-color: #1a2333;
     border-left: 3px solid var(--neon-blue);
 }
-
-/* =========================================================
-   AÑADIDOS FUNCIONALES (Modales, Inputs, Botones y Mapa) 
-   ========================================================= */
 
 /* Modales e Inputs */
 .modal-overlay {
@@ -168,4 +162,24 @@ body {
 .pc-node.available { border-color: #4ade80; color: #4ade80; }
 .pc-node.available:hover { background: rgba(74, 222, 128, 0.1); box-shadow: 0 0 10px rgba(74, 222, 128, 0.4); transform: scale(1.05); }
 .pc-node.occupied { border-color: #f87171; color: #f87171; cursor: not-allowed; opacity: 0.5; }
-.pc-node.selected { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); box-shadow: var(--neon-glow); }
+.pc-node.selected { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); box-shadow: var(--neon-glow); } 
+
+/* CORRECCIÓN LOGO */
+.logo-wrapper {
+    width: 100px;
+    height: 100px;
+    background: #0b101a;
+    border: 1px solid rgba(123, 162, 248, 0.3);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px auto;
+    overflow: hidden;
+}
+
+.logo-img {
+    max-width: auto;
+    height: auto;
+    object-fit: auto;
+}

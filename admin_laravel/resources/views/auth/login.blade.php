@@ -9,7 +9,9 @@
 
     <div class="neon-box" style="width: 380px; padding: 50px 40px; text-align: center;">
         <div class="neon-box" style="width: 80px; height: 80px; margin: 0 auto 30px auto; display: flex; align-items: center; justify-content: center; background-color: #0b101a;">
-            <h2 style="color: #4ade80; margin: 0; font-weight: 800; letter-spacing: 2px;">SAGE</h2>
+            <div class="logo-wrapper"> 
+                <img src="{{ asset('img/logo_sadge.png') }}" alt="Logo" class="logo-img">
+            </div>
         </div>
 
         <form action="{{ route('login.post') }}" method="POST">

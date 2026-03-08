@@ -168,4 +168,21 @@ body {
 .pc-node.available { border-color: #4ade80; color: #4ade80; }
 .pc-node.available:hover { background: rgba(74, 222, 128, 0.1); box-shadow: 0 0 10px rgba(74, 222, 128, 0.4); transform: scale(1.05); }
 .pc-node.occupied { border-color: #f87171; color: #f87171; cursor: not-allowed; opacity: 0.5; }
-.pc-node.selected { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); box-shadow: var(--neon-glow); }
+.pc-node.selected { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); box-shadow: var(--neon-glow); } 
+
+
+        .logo-wrapper {
+            width: 170px;
+            height: 170px;
+            background: var(--bg-gray);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 25px auto 25px;
+        }
+
+        .logo-img {
+            width: 250px;
+            height: auto;
+        }

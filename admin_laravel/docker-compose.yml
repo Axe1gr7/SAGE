@@ -1,0 +1,11 @@
+services:
+  admin_macuin:
+    build: .
+    container_name: admin_sage
+    ports:
+      - "8020:8000" # A la izquierda el puerto de tu PC (8010), a la derecha el del contenedor (8000)
+    volumes:
+      - .:/var/www
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true

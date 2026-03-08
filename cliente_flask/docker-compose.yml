@@ -1,0 +1,8 @@
+services:
+  cliente_flask:
+    build: .
+    container_name: flask_cliente_sage
+    ports:
+      - "5040:5040"
+    volumes:
+      - .:/app
