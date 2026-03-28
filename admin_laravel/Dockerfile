@@ -1,9 +1,10 @@
+# Usar la imagen oficial de PHP
 FROM php:8.4-cli
 
 # Crear carpeta de trabajo 
 WORKDIR /var/www
 
-# Instalar dependencias del sistema y herramientas de PHP
+# Instalar dependencias del sistema, herramientas y librerías para PostgreSQL
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
@@ -11,10 +12,11 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     curl \
-    libzip-dev
+    libzip-dev \
+    libpq-dev  # <-- ¡NUEVO! Vital para que PHP pueda hablar con PostgreSQL
 
-# Instalar extensiones de PHP necesarias para Laravel
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# Instalar extensiones de PHP (Cambié pdo_mysql por pdo_pgsql)
+RUN docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Copiar Composer de la imagen oficial
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -22,7 +24,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copiar el código del proyecto al contenedor
 COPY . .
 
-# Instalar las dependencias de Laravel (Equivalente a pip install -r requirements.txt)
+# Instalar las dependencias de Laravel 
 RUN composer install --no-interaction --optimize-autoloader
 
 # Asegurar que las carpetas existan y dar permisos de escritura (Vital para Laravel)

@@ -1,19 +1,26 @@
+# Usar imagen oficial de Python
 FROM python:3.12-slim
 
-# crear carpeta de trabajo 
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# copia de requerimientos 
+# Copiar requerimientos de Flask (flask, requests, etc.)
 COPY requirements.txt .
 
-# instalarlos
+# Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# copiar codigo del proyecto
+# Copiar el código de la aplicación (plantillas, estáticos, rutas)
 COPY . .
 
-# exponer puerto a trabajar 
+# Exponer el puerto 5040 que definiste en el docker-compose
 EXPOSE 5040
 
-# Comandos para ejecutar flask
-CMD ["python", "app.py"]
+# Asumiendo que tu archivo principal de Flask se llama app.py o main.py
+# (Ajusta "app.py" por el nombre de tu archivo principal si es diferente)
+ENV FLASK_APP=app.py 
+
+# Comando para ejecutar el servidor de desarrollo de Flask
+CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5040"]

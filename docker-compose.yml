@@ -1,0 +1,64 @@
+services:
+  # 1. Base de Datos (PostgreSQL)
+  postgres:
+    image: postgres:15
+    container_name: ServerPostgreSql-SAGE
+    restart: always
+    environment:
+      POSTGRES_USER: SAGE
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: DB_SAGE
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U SAGE -d DB_SAGE"]
+      interval: 5s
+      retries: 5
+      timeout: 5s
+
+  # 2. Tu API Central (FastAPI)
+  api_sage:
+    build: ./api_fastapi  
+    container_name: fastapi_api_sage
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api_fastapi:/app 
+    environment:
+      - DATABASE_URL=postgresql://SAGE:1234@ServerPostgreSql-SAGE:5432/DB_SAGE
+    depends_on:
+      postgres:
+        condition: service_healthy 
+
+  # 3. Web 2: Cliente Estudiantes (Flask)
+  cliente_sage:
+    build: ./cliente_flask 
+    container_name: flask_cliente_sage
+    ports:
+      - "5040:5040"
+    volumes:
+      - ./cliente_flask:/app 
+    depends_on:
+      - api_sage 
+    environment:
+      - API_URL=http://api_sage:8000 
+
+  # 4. Web 1: Admin Gestores (Laravel)
+  admin_sage:
+    build: ./admin_laravel 
+    container_name: admin_sage
+    ports:
+      - "8020:8000" 
+    volumes:
+      - ./admin_laravel:/var/www 
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - API_URL=http://api_sage:8000 
+    depends_on:
+      - api_sage 
+
+volumes:
+  postgres_data:
