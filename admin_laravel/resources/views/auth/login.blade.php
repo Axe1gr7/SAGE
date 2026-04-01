@@ -3,34 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>Login - SAGE</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
-<body style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+<body>
 
-    <div class="neon-box" style="width: 380px; padding: 50px 40px; text-align: center;">
-        <div class="neon-box" style="width: 80px; height: 80px; margin: 0 auto 30px auto; display: flex; align-items: center; justify-content: center; background-color: #0b101a;">
-            <div class="logo-wrapper"> 
-                <img src="{{ asset('img/logo_sadge.png') }}" alt="Logo" class="logo-img">
-            </div>
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center fondo">
+
+    <div class="login-card p-4">
+
+        <div class="text-center mb-4">
+            <img src="{{ asset('img/logo_sage.png') }}" class="logo mb-2" alt="Logo SAGE">
         </div>
 
-        <form action="{{ route('login.post') }}" method="POST">
+        <form method="POST" action="{{ route('login.post') }}">
             @csrf
-            <div style="text-align: left; margin-bottom: 20px;">
-                <label style="color: #94a3b8; font-size: 0.9rem;">Correo:</label>
-                <input type="email" name="email" placeholder="123046426@upq.edu.mx" required style="width: 100%; padding: 12px; margin-top: 5px; background: #1a2333; border: 1px solid #334155; border-radius: 8px; color: white; box-sizing: border-box; outline: none;">
+
+            <div class="mb-3">
+                <label class="form-label text-light">Correo:</label>
+                <input type="email" name="email" class="form-control input-custom" placeholder="ejemplo@correo.com" value="{{ old('email') }}" required>
             </div>
 
-            <div style="text-align: left; margin-bottom: 40px;">
-                <label style="color: #94a3b8; font-size: 0.9rem;">Contraseña:</label>
-                <input type="password" name="password" placeholder="••••••••••••" required style="width: 100%; padding: 12px; margin-top: 5px; background: #1a2333; border: 1px solid #334155; border-radius: 8px; color: white; box-sizing: border-box; outline: none;">
+            <div class="mb-3">
+                <label class="form-label text-light">Contraseña:</label>
+                <input type="password" name="password" class="form-control input-custom" placeholder="********" required>
             </div>
 
-            <button type="submit" style="background-color: #dbeafe; color: #1e3a8a; border: none; padding: 12px 40px; border-radius: 30px; font-weight: 800; cursor: pointer; font-size: 1rem; width: 80%; transition: background 0.3s;">
-                Iniciar sesión
-            </button>
+            <div class="form-check mb-3 text-light">
+                <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                <label class="form-check-label" for="remember">Recordarme</label>
+            </div>
+
+            <div class="d-grid">
+                <button class="btn btn-login" type="submit">Iniciar sesión</button>
+            </div>
+
         </form>
+
     </div>
 
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

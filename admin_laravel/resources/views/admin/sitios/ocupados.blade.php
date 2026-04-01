@@ -1,72 +1,155 @@
 @extends('layouts.app')
 
 @section('content')
-    <div>
-        <h1 class="title-outline">ESPACIOS OCUPADOS</h1>
-        
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-            <select class="neon-box" style="padding: 10px; color: white; border: 1px solid var(--neon-blue); outline: none;">
-                <option>Laboratorio A1</option>
-                <option>Laboratorio A2</option>
-            </select>
-            <input type="date" class="neon-box" style="padding: 10px; color: white; border: 1px solid var(--neon-blue); outline: none; color-scheme: dark;">
-        </div>
+<div class="ocupados-container">
+    <h1 class="dashboard-title">ESPACIOS OCUPADOS</h1>
 
-        <div class="neon-box" style="padding: 2px; overflow: hidden;">
-            <table class="neon-table">
-                <thead>
-                    <tr>
-                        <th>Horario</th>
-                        <th>Espacio / PC</th>
-                        <th>Ocupado por</th>
-                        <th>Tipo</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>10:00 - 12:00</td>
-                        <td>PC-04</td>
-                        <td>Juan Pérez (Estudiante)</td>
-                        <td>Individual</td>
-                        <td><button onclick="abrirModal('Juan Pérez', 'PC-04')" style="background: #ef4444; color: white; font-weight: bold; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer;">Cancelar</button></td>
-                    </tr>
-                    <tr>
-                        <td>12:00 - 14:00</td>
-                        <td>Sala Completa</td>
-                        <td>Ing. Software (Clase)</td>
-                        <td>Clase</td>
-                        <td><button onclick="abrirModal('Clase Ing. Software', 'Sala Completa')" style="background: #ef4444; color: white; font-weight: bold; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer;">Cancelar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="filters-row ocupados-filters">
+        <select id="espacio-select" class="neon-input filter-select">
+            @foreach($espacios as $esp)
+                <option value="{{ $esp['id_espacio'] }}">{{ $esp['nombre'] }}</option>
+            @endforeach
+        </select>
+        <input type="date" id="fecha-select" class="neon-input filter-date" value="{{ $fecha_hoy }}">
     </div>
 
-    <div id="cancelModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center;">
-        <div class="neon-box" style="width: 400px; padding: 30px; text-align: center; border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);">
-            <h2 style="color: #ef4444; margin-top: 0;">Cancelar Reserva</h2>
-            <p id="modalInfo" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;"></p>
-            
-            <form action="#" method="POST" style="text-align: left;">
-                <label style="color: white; font-size: 0.9rem;">Motivo de cancelación:</label>
-                <textarea required rows="4" style="width: 100%; padding: 10px; margin-top: 10px; margin-bottom: 20px; background: #1a2333; border: 1px solid #334155; border-radius: 8px; color: white; resize: none;"></textarea>
-                
-                <div style="display: flex; justify-content: space-between;">
-                    <button type="button" onclick="cerrarModal()" style="background: transparent; color: white; border: 1px solid white; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Volver</button>
-                    <button type="submit" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">Confirmar Cancelación</button>
-                </div>
-            </form>
+    <div class="neon-box tabla-container">
+        <table class="neon-table">
+            <thead>
+                    <th>Horario</th>
+                    <th>Espacio / PC</th>
+                    <th>Ocupado por</th>
+                    <th>Tipo</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-reservas">
+                <tr><td colspan="5" class="text-center">Cargando reservas...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal de cancelación (Bootstrap) -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content sage-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">Cancelar Reserva</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalInfo" class="mb-3"></p>
+                <form id="formCancelar">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Motivo de cancelación:</label>
+                        <textarea name="motivo" id="motivo" rows="4" class="neon-input" required></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Volver</button>
+                        <button type="submit" class="btn btn-danger">Confirmar Cancelación</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+</div>
+@endsection
 
-    <script>
-        function abrirModal(usuario, espacio) {
-            document.getElementById('modalInfo').innerText = "Cancelando reserva de: " + usuario + " en " + espacio;
-            document.getElementById('cancelModal').style.display = 'flex';
+@section('scripts')
+<script>
+    let modalCancel;
+    let reservaActualId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        modalCancel = new bootstrap.Modal(document.getElementById('cancelModal'));
+        document.getElementById('espacio-select').addEventListener('change', cargarReservas);
+        document.getElementById('fecha-select').addEventListener('change', cargarReservas);
+        cargarReservas(); // Carga inicial
+    });
+
+    async function cargarReservas() {
+        const espacioId = document.getElementById('espacio-select').value;
+        const fecha = document.getElementById('fecha-select').value;
+        const tbody = document.getElementById('tabla-reservas');
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando reservas...</td></tr>';
+
+        try {
+            const response = await fetch(`/reservas?espacio_id=${espacioId}&fecha=${fecha}`);
+            const reservas = await response.json();
+            if (!reservas.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay reservas activas en este espacio en la fecha seleccionada.</td></tr>';
+                return;
+            }
+            let html = '';
+            reservas.forEach(res => {
+                const inicio = new Date(res.fecha_hora_inicio);
+                const fin = new Date(res.fecha_hora_fin);
+                const horario = `${inicio.toLocaleTimeString()} - ${fin.toLocaleTimeString()}`;
+                const espacioNombre = res.espacio?.nombre || 'N/A';
+                const equipoNombre = res.id_equipo ? `PC-${res.id_equipo}` : 'Sala completa';
+                let ocupante = '';
+                if (res.tipo_reserva === 'estudiante' && res.estudiante_beneficiario) {
+                    ocupante = `${res.estudiante_beneficiario.nombre_completo} (Estudiante)`;
+                } else if (res.tipo_reserva === 'clase' && res.clase_beneficiario) {
+                    ocupante = `${res.clase_beneficiario.nombre} (Clase)`;
+                } else if (res.tipo_reserva === 'evento' && res.evento_beneficiario) {
+                    ocupante = `${res.evento_beneficiario.nombre} (Evento)`;
+                } else {
+                    ocupante = 'No especificado';
+                }
+                const tipo = res.tipo_reserva === 'estudiante' ? 'Individual' : (res.tipo_reserva === 'clase' ? 'Clase' : 'Evento');
+                html += `<tr>
+                            <td>${horario}</td>
+                            <td>${equipoNombre} (${espacioNombre})</td>
+                            <td>${ocupante}</td>
+                            <td>${tipo}</td>
+                            <td>
+                                <button class="btn-cancelar" onclick="abrirModalCancelacion(${res.id_reserva}, '${ocupante.replace(/'/g, "\\'")}', '${equipoNombre}')">Cancelar</button>
+                            </td>
+                         </tr>`;
+            });
+            tbody.innerHTML = html;
+        } catch (error) {
+            console.error('Error cargando reservas:', error);
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Error al cargar las reservas</td></tr>';
         }
-        function cerrarModal() {
-            document.getElementById('cancelModal').style.display = 'none';
+    }
+
+    function abrirModalCancelacion(idReserva, usuario, espacio) {
+        reservaActualId = idReserva;
+        document.getElementById('modalInfo').innerText = `Cancelando reserva de: ${usuario} en ${espacio}`;
+        modalCancel.show();
+    }
+
+    document.getElementById('formCancelar').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const motivo = document.getElementById('motivo').value;
+        if (!motivo) {
+            alert('Debes escribir un motivo.');
+            return;
         }
-    </script>
+        try {
+            const response = await fetch(`/reservas/${reservaActualId}/cancelar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ motivo })
+            });
+            const data = await response.json();
+            if (data.error) {
+                alert('Error al cancelar: ' + data.message);
+            } else {
+                modalCancel.hide();
+                cargarReservas(); // recargar tabla
+                document.getElementById('motivo').value = '';
+            }
+        } catch (error) {
+            alert('Error de conexión');
+        }
+    });
+</script>
 @endsection

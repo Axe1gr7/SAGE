@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import cast, Date
 from datetime import datetime, date as date_type
 from app.data.database import get_db
 from app.models.SAGE_BD import (
@@ -69,6 +70,99 @@ def validar_beneficiario_segun_tipo(
             raise HTTPException(404, "Evento no encontrado")
     else:
         raise HTTPException(400, "Tipo de reserva inválido")
+
+# ==========================================
+# ENDPOINTS PARA MAPA INTERACTIVO
+# ==========================================
+
+@router.get("/ocupacion")
+async def get_ocupacion(
+    fecha: date_type = Query(...),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Devuelve la ocupación de los equipos para una fecha específica.
+    """
+    reservas = db.query(Reserva).filter(
+        cast(Reserva.fecha_hora_inicio, Date) == fecha,
+        Reserva.estado == EstadoReserva.ACTIVA,
+        Reserva.estatus == 0
+    ).all()
+
+    ocupacion = {}
+    for r in reservas:
+        if not r.id_equipo:
+            continue
+            
+        eq_id = str(r.id_equipo)
+        if eq_id not in ocupacion:
+            ocupacion[eq_id] = []
+        
+        ocupacion[eq_id].append({
+            "inicio": r.fecha_hora_inicio.strftime("%H:%M"),
+            "fin": r.fecha_hora_fin.strftime("%H:%M")
+        })
+
+    return {"ocupacion": ocupacion}
+
+@router.get("/equipos/{equipo_id}/modulos-disponibles")
+async def get_modulos_disponibles(
+    equipo_id: int,
+    fecha: date_type = Query(...),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Devuelve los módulos dinámicos libres para un equipo específico en una fecha.
+    """
+    # 1. Validar que el equipo exista
+    equipo = db.query(Equipo).filter(Equipo.id_equipo == equipo_id, Equipo.estatus == 0).first()
+    if not equipo:
+        raise HTTPException(404, "Equipo no encontrado")
+
+    # 2. Obtener todos los módulos activos de la base de datos
+    modulos_db = db.query(Modulo).filter(Modulo.estatus == 0).order_by(Modulo.hora_inicio).all()
+
+    # 3. Obtener las reservas activas del equipo para ese día
+    reservas = db.query(Reserva).filter(
+        Reserva.id_equipo == equipo_id,
+        cast(Reserva.fecha_hora_inicio, Date) == fecha,
+        Reserva.estado == EstadoReserva.ACTIVA,
+        Reserva.estatus == 0
+    ).all()
+
+    modulos_libres = []
+    
+    # 4. Cruzar módulos con reservas
+    for mod in modulos_db:
+        inicio_mod = datetime.combine(fecha, mod.hora_inicio)
+        fin_mod = datetime.combine(fecha, mod.hora_fin)
+        
+        ocupado = False
+        for r in reservas:
+            # Lógica de solapamiento de horarios
+            if r.fecha_hora_inicio < fin_mod and r.fecha_hora_fin > inicio_mod:
+                ocupado = True
+                break
+                
+        if not ocupado:
+            # Se asume que tu modelo Modulo tiene un campo 'nombre' o descriptivo.
+            # Si se llama diferente (ej. 'descripcion'), cámbialo aquí.
+            nombre_modulo = getattr(mod, 'nombre', f"Módulo {mod.id_modulo}")
+            
+            modulos_libres.append({
+                "id_modulo": mod.id_modulo,
+                "nombre": nombre_modulo,
+                "hora_inicio": mod.hora_inicio.strftime("%H:%M"),
+                "hora_fin": mod.hora_fin.strftime("%H:%M")
+            })
+
+    return {"modulos": modulos_libres}
+
+# ==========================================
+# RUTAS ESTÁNDAR CRUD
+# ==========================================
 
 @router.post("/", response_model=ReservaResponse)
 async def crear_reserva(
@@ -148,37 +242,29 @@ async def crear_reserva_estudiante(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    # Solo estudiantes pueden usar este endpoint
     if not isinstance(current_user, Estudiante):
         raise HTTPException(403, "Solo estudiantes pueden usar este endpoint")
 
-    # Obtener módulo
     modulo = db.query(Modulo).filter(Modulo.id_modulo == reserva.id_modulo, Modulo.estatus == 0).first()
     if not modulo:
         raise HTTPException(404, "Módulo no encontrado")
 
-    # Obtener espacio
     espacio = db.query(Espacio).filter(Espacio.id_espacio == reserva.id_espacio, Espacio.estatus == 0).first()
     if not espacio:
         raise HTTPException(404, "Espacio no encontrado")
 
-    # Verificar que el espacio permita reservas
     if not espacio.disponible:
         raise HTTPException(400, "Espacio no disponible para reservas")
 
-    # Verificar horario dentro del rango del espacio
     if modulo.hora_inicio < espacio.horario_apertura or modulo.hora_fin > espacio.horario_cierre:
         raise HTTPException(400, f"Módulo fuera del horario del espacio ({espacio.horario_apertura} - {espacio.horario_cierre})")
 
-    # Construir datetime
     inicio = datetime.combine(reserva.fecha, modulo.hora_inicio)
     fin = datetime.combine(reserva.fecha, modulo.hora_fin)
 
-    # No reservar en pasado
     if inicio < datetime.now():
         raise HTTPException(400, "No se puede reservar en el pasado")
 
-    # Verificar disponibilidad del equipo si se especificó
     if reserva.id_equipo:
         equipo = db.query(Equipo).filter(
             Equipo.id_equipo == reserva.id_equipo,
@@ -190,11 +276,9 @@ async def crear_reserva_estudiante(
         if equipo.estado_operativo.value != "operativo":
             raise HTTPException(400, "Equipo en mantenimiento, no se puede reservar")
 
-    # Verificar disponibilidad
     if not verificar_disponibilidad(db, espacio.id_espacio, reserva.id_equipo, inicio, fin):
         raise HTTPException(409, "El espacio/equipo ya está reservado en ese horario")
 
-    # Crear reserva
     db_reserva = Reserva(
         id_espacio=reserva.id_espacio,
         id_equipo=reserva.id_equipo,

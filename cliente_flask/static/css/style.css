@@ -1,75 +1,276 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
+/* =========================================================
+   VARIABLES GLOBALES
+   ========================================================= */
 :root {
-    --bg-dark: #0b101a;
-    --panel-bg: #151e2e;
-    --neon-blue: #7ba2f8;
-    --neon-glow: 0px 0px 15px rgba(123, 162, 248, 0.3), inset 0px 0px 5px rgba(123, 162, 248, 0.2);
-    --text-main: #e2e8f0;
+    --bg-dark: #0d1117;
+    --bg-nav: rgba(13, 17, 23, 0.97);
+    --bg-modal: #161b22;
+    --panel-bg: #161b22;
+    --sidebar-bg: #0d1117;
+    --input-bg: #1c2230;
+    --input-border: #2d3a50;
+
+    --neon-blue: #4a7fa5;
+    --neon-blue-bright: #6a9fc0;
+    --neon-blue-dim: rgba(74, 127, 165, 0.12);
+    --neon-glow: 0px 0px 12px rgba(74, 127, 165, 0.18), inset 0px 0px 6px rgba(74, 127, 165, 0.08);
+    --neon-glow-strong: 0px 0px 20px rgba(74, 127, 165, 0.28), inset 0px 0px 8px rgba(74, 127, 165, 0.12);
+
+    --text-main: #cdd9e5;
+    --text-muted: #768a9e;
+    --text-soft: #a3b5c5;
+
+    --green: #3a8f6e;
+    --green-glow: 0 0 10px rgba(58, 143, 110, 0.3);
+    --red: #a8444f;
+    --red-glow: 0 0 10px rgba(168, 68, 79, 0.3);
+    --yellow: #a88a3a;
+    --yellow-glow: 0 0 10px rgba(168, 138, 58, 0.3);
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
 body {
     margin: 0;
     padding: 0;
     background-color: var(--bg-dark);
+    background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(30, 50, 80, 0.10) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 90%, rgba(20, 35, 60, 0.08) 0%, transparent 60%);
+    background-attachment: fixed;
     color: var(--text-main);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
 }
 
+/* =========================================================
+   NEON COMPONENTS
+   ========================================================= */
 .neon-box {
     background-color: var(--panel-bg);
-    border: 1px solid var(--neon-blue);
+    border: 1px solid rgba(91, 156, 246, 0.4);
     border-radius: 12px;
     box-shadow: var(--neon-glow);
     transition: all 0.3s ease;
 }
 
 .neon-box:hover {
-    box-shadow: 0px 0px 20px rgba(123, 162, 248, 0.6), inset 0px 0px 8px rgba(123, 162, 248, 0.4);
+    border-color: var(--neon-blue);
+    box-shadow: var(--neon-glow-strong);
 }
 
 .title-outline {
     font-size: 2.8rem;
     font-weight: 800;
     color: transparent;
-    -webkit-text-stroke: 1.5px #ffffff;
+    -webkit-text-stroke: 1.5px var(--neon-blue-bright);
     text-align: center;
     letter-spacing: 4px;
     margin-bottom: 30px;
     text-transform: uppercase;
+    text-shadow: 0 0 30px rgba(74, 127, 165, 0.12);
 }
 
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 30px;
+    background: var(--bg-nav);
+    border-bottom: 1px solid rgba(74, 127, 165, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+}
+
+.navbar-left {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.navbar-hamburger {
+    color: var(--neon-blue);
+    font-size: 1.5rem;
+    transition: color 0.2s;
+}
+
+.navbar-left:hover .navbar-hamburger {
+    color: var(--neon-blue-bright);
+}
+
+.navbar-brand {
+    color: var(--green);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 4px;
+    font-weight: 700;
+    text-shadow: none;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.navbar-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+}
+
+.navbar-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--neon-blue);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: var(--neon-blue-dim);
+}
+
+.navbar-avatar:hover {
+    border-color: var(--neon-blue-bright);
+    box-shadow: 0 0 8px rgba(74, 127, 165, 0.3);
+    transform: scale(1.08);
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 250px;
+    height: 100vh;
+    background: linear-gradient(180deg, #131920 0%, #0d1117 100%);
+    border-right: 1px solid rgba(74, 127, 165, 0.15);
+    box-shadow: 6px 0 20px rgba(0, 0, 0, 0.5);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1001;
+    padding-top: 20px;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar-item {
+    display: block;
+    padding: 14px 25px;
+    color: var(--text-soft);
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+    letter-spacing: 0.5px;
+}
+
+.sidebar-item:hover {
+    color: var(--text-main);
+    background-color: rgba(74, 127, 165, 0.07);
+    border-left: 3px solid var(--neon-blue);
+}
+
+.sidebar-item.text-green {
+    color: var(--green);
+}
+
+.sidebar-item.text-green:hover {
+    background-color: rgba(58, 143, 110, 0.07);
+    border-left: 3px solid var(--green);
+}
+
+.sidebar-item.text-red {
+    color: var(--red);
+    margin-top: 50px;
+}
+
+.sidebar-item.text-red:hover {
+    background-color: rgba(168, 68, 79, 0.07);
+    border-left: 3px solid var(--red);
+}
+
+.sidebar-divider {
+    border: none;
+    border-top: 1px solid rgba(74, 127, 165, 0.12);
+    margin: 12px 20px;
+}
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+.main-content {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* =========================================================
+   CAPSULE MENU (TABS)
+   ========================================================= */
 .capsule-menu {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 16px;
     margin-bottom: 40px;
 }
 
 .capsule-btn {
-    padding: 12px 35px;
+    padding: 11px 32px;
     border-radius: 30px;
-    color: white;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.25s ease;
+    font-family: inherit;
 }
 
-/* Agregado para el estado activo/inactivo de las pestañas respetando tu estilo */
 .capsule-btn.active {
-    background-color: var(--neon-blue);
-    color: var(--bg-dark);
+    background: linear-gradient(135deg, var(--neon-blue) 0%, #2d5f80 100%);
+    color: #fff;
     border: 1px solid var(--neon-blue);
+    box-shadow: 0 0 10px rgba(74, 127, 165, 0.25);
 }
+
 .capsule-btn.inactive {
     background-color: transparent;
     color: var(--neon-blue);
-    border: 1px solid var(--neon-blue);
+    border: 1px solid rgba(74, 127, 165, 0.35);
 }
 
+.capsule-btn.inactive:hover {
+    background-color: var(--neon-blue-dim);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 8px rgba(74, 127, 165, 0.15);
+}
+
+/* =========================================================
+   TABLA
+   ========================================================= */
 .neon-table {
     width: 100%;
     border-collapse: collapse;
@@ -77,112 +278,1497 @@ body {
 }
 
 .neon-table th {
-    border: 1px solid rgba(123, 162, 248, 0.3);
-    padding: 15px;
+    border: 1px solid rgba(74, 127, 165, 0.2);
+    padding: 14px 15px;
     text-align: center;
     font-weight: 600;
-    color: var(--text-main);
+    color: var(--neon-blue-bright);
+    background: rgba(74, 127, 165, 0.05);
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
 }
 
 .neon-table td {
-    border: 1px solid rgba(123, 162, 248, 0.3);
-    padding: 15px;
+    border: 1px solid rgba(74, 127, 165, 0.1);
+    padding: 13px 15px;
     text-align: center;
-    color: #94a3b8;
+    color: var(--text-muted);
+    transition: background 0.2s;
 }
 
-/* Sidebar Estilos */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: -300px;
-    width: 260px;
-    height: 100vh;
-    background-color: #0d1424;
-    border-right: 1px solid rgba(123, 162, 248, 0.2);
-    box-shadow: 5px 0 20px rgba(0,0,0,0.8);
-    transition: left 0.3s ease;
-    z-index: 1000;
-    padding-top: 80px;
-}
-.sidebar.active { left: 0; }
-.sidebar-item {
-    display: block;
-    padding: 15px 30px;
-    color: #94a3b8;
-    text-decoration: none;
-    font-size: 1.1rem;
-    border-left: 3px solid transparent;
-    transition: all 0.2s;
-}
-.sidebar-item:hover {
-    color: white;
-    background-color: #1a2333;
-    border-left: 3px solid var(--neon-blue);
+.neon-table tr:hover td {
+    background: rgba(74, 127, 165, 0.04);
+    color: var(--text-soft);
 }
 
 /* =========================================================
-   AÑADIDOS FUNCIONALES (Modales, Inputs, Botones y Mapa) 
+   MODALES
+   ========================================================= */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 7, 16, 0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-overlay.flex {
+    display: flex;
+}
+
+.modal-content {
+    background: linear-gradient(160deg, #1a2232 0%, #141c28 100%);
+    border: 1px solid rgba(91, 156, 246, 0.4);
+    border-radius: 16px;
+    width: 420px;
+    padding: 32px;
+    box-shadow: 0 0 24px rgba(74, 127, 165, 0.12), 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.modal-title {
+    color: var(--neon-blue-bright);
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    margin-top: 0;
+    margin-bottom: 24px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    gap: 12px;
+}
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+.neon-input {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--input-bg);
+    color: var(--text-main);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    margin-top: 5px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+
+.neon-input:focus {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(91, 156, 246, 0.35);
+}
+
+.neon-input[readonly] {
+    color: var(--text-muted);
+    cursor: default;
+    opacity: 0.75;
+}
+
+.input-label {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 3px;
+}
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+.btn-action-yellow {
+    background-color: var(--yellow);
+    color: #000;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: box-shadow 0.25s, transform 0.15s;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.btn-action-yellow:hover {
+    box-shadow: var(--yellow-glow);
+    transform: translateY(-1px);
+}
+
+.btn-action-green {
+    background: linear-gradient(135deg, var(--green) 0%, #28c490 100%);
+    color: #051a10;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: box-shadow 0.25s, transform 0.15s;
+    font-size: 0.9rem;
+}
+
+.btn-action-green:hover {
+    box-shadow: var(--green-glow);
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 1px solid rgba(220, 232, 255, 0.35);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-outline:hover {
+    border-color: var(--text-main);
+    background: rgba(220, 232, 255, 0.05);
+}
+
+.btn-outline-red {
+    background: transparent;
+    border: 1px solid rgba(240, 95, 122, 0.5);
+    color: var(--red);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: box-shadow 0.25s, background 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-outline-red:hover {
+    background: rgba(240, 95, 122, 0.08);
+    box-shadow: var(--red-glow);
+}
+
+/* =========================================================
+   MAPA DE LABORATORIO
+   ========================================================= */
+.lab-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    padding: 20px;
+}
+
+.pc-node {
+    height: 62px;
+    background: rgba(6, 10, 18, 0.7);
+    border: 2px solid rgba(74, 127, 165, 0.18);
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    color: var(--text-muted);
+}
+
+.pc-node.available {
+    border-color: rgba(54, 217, 160, 0.6);
+    color: var(--green);
+}
+
+.pc-node.available:hover {
+    background: rgba(58, 143, 110, 0.07);
+    box-shadow: var(--green-glow);
+    transform: scale(1.05);
+    border-color: var(--green);
+}
+
+.pc-node.occupied {
+    border-color: rgba(240, 95, 122, 0.4);
+    color: var(--red);
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.pc-node.selected {
+    background: linear-gradient(135deg, var(--neon-blue) 0%, #2d5f80 100%);
+    color: #fff;
+    border-color: var(--neon-blue-bright);
+    box-shadow: var(--neon-glow-strong);
+    transform: scale(1.05);
+}
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+.logo-wrapper {
+    width: 170px;
+    height: 170px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 25px auto;
+    background: rgba(74, 127, 165, 0.05);
+    border: 1px solid rgba(74, 127, 165, 0.15);
+}
+
+.logo-img {
+    width: 250px;
+    height: auto;
+}
+
+/* =========================================================
+   DASHBOARD — PORTAL ESTUDIANTIL
+   ========================================================= */
+.portal-title {
+    font-size: 2rem;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    color: var(--neon-blue-bright);
+    text-shadow: 0 0 14px rgba(91, 156, 246, 0.5);
+    margin-bottom: 40px;
+    /* Sobreescribe .title-outline para esta variante con color */
+    -webkit-text-stroke: 0;
+}
+
+.portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.portal-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 160px;
+    text-decoration: none;
+    color: var(--text-main);
+    background: rgba(22, 27, 34, 0.9);
+    border: 1px solid rgba(74, 127, 165, 0.25);
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 2px 10px rgba(74, 127, 165, 0.08);
+}
+
+.portal-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 4px 18px rgba(74, 127, 165, 0.18);
+    border-color: var(--green);
+}
+
+.portal-card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.portal-card-label {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+    text-align: center;
+    padding: 0 10px;
+}
+
+/* =========================================================
+   MAPA DE ESPACIOS — AGENDAR
    ========================================================= */
 
-/* Modales e Inputs */
-.modal-overlay {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(11, 16, 26, 0.85); z-index: 2000; justify-content: center; align-items: center;
-}
-.modal-content {
-    background-color: var(--panel-bg); border: 1px solid var(--neon-blue);
-    border-radius: 12px; width: 450px; padding: 30px; box-shadow: var(--neon-glow);
-}
-.neon-input {
-    width: 100%; padding: 12px; background: rgba(11, 16, 26, 0.6); color: white;
-    border: 1px solid rgba(123, 162, 248, 0.4); border-radius: 8px; outline: none; 
-    box-sizing: border-box; margin-bottom: 15px; margin-top: 5px; transition: 0.3s;
-}
-.neon-input:focus { border-color: var(--neon-blue); box-shadow: 0 0 8px rgba(123, 162, 248, 0.4); }
-
-/* Botones de acción */
-.btn-action-yellow {
-    background-color: #fbbf24; color: #000; border: none; padding: 8px 20px;
-    border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.85rem;
-}
-.btn-action-yellow:hover { box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
-.btn-action-green {
-    background-color: #4ade80; color: #000; border: none; padding: 10px 20px;
-    border-radius: 8px; font-weight: bold; cursor: pointer;
-}
-.btn-outline {
-    background-color: transparent; color: white; border: 1px solid white;
-    padding: 10px 20px; border-radius: 8px; cursor: pointer;
+/* Controles superiores: selector + fecha */
+.espacios-controles {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-/* Mapa de Laboratorio */
+.espacios-controles .neon-input {
+    margin: 0;
+    background: var(--input-bg);
+    color: var(--text-main);
+    color-scheme: dark;
+}
+
+.espacios-controles .neon-input--select {
+    width: 250px;
+    font-weight: 600;
+}
+
+.espacios-controles .neon-input--date {
+    width: 200px;
+}
+
+/* Layout principal: mapa + leyenda */
+.espacios-layout {
+    display: flex;
+    gap: 30px;
+}
+
+/* Panel del mapa */
+.espacios-mapa {
+    flex-grow: 1;
+    padding: 20px;
+    background: rgba(15, 24, 41, 0.8);
+}
+
+.espacios-frente {
+    background: rgba(91, 156, 246, 0.08);
+    text-align: center;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    border: 1px dashed rgba(91, 156, 246, 0.5);
+    border-radius: 8px;
+    color: var(--neon-blue-bright);
+    letter-spacing: 2px;
+    font-size: 0.85rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Sobreescritura de pc-node para esta vista (colores sólidos) */
+.espacios-mapa .pc-node.occupied {
+    background: rgba(240, 95, 122, 0.15);
+    opacity: 1;
+}
+
+.espacios-mapa .pc-node.available {
+    background: rgba(54, 217, 160, 0.1);
+}
+
+.espacios-mapa .pc-node.selected-node {
+    background: rgba(91, 156, 246, 0.25);
+    border-color: var(--neon-blue-bright);
+    color: var(--text-main);
+    box-shadow: var(--neon-glow);
+}
+
+/* Panel de leyenda */
+.espacios-leyenda {
+    width: 200px;
+    padding: 20px;
+    height: fit-content;
+    background: rgba(15, 24, 41, 0.8);
+}
+
+.leyenda-titulo {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--text-main);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+}
+
+.leyenda-item {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.leyenda-item:last-child {
+    margin-bottom: 0;
+}
+
+.leyenda-dot {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+.leyenda-dot--green  { color: var(--green); }
+.leyenda-dot--red    { color: var(--red); }
+.leyenda-dot--blue   { color: var(--neon-blue); }
+
+/* Modal de reserva — variante verde */
+.modal-content--green {
+    border-color: rgba(54, 217, 160, 0.5);
+}
+
+.modal-title--green {
+    color: var(--green);
+    font-family: 'Orbitron', sans-serif;
+    text-align: left;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.reserva-equipo-label {
+    color: var(--text-muted);
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+}
+
+.reserva-equipo-valor {
+    color: var(--neon-blue-bright);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.reserva-horario-info {
+    color: var(--green);
+    font-size: 0.85rem;
+    margin: 0 0 20px;
+}
+
+.reserva-horas {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.reserva-horas-campo {
+    flex: 1;
+}
+
+.reserva-horas-campo .input-label {
+    font-size: 0.9rem;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* =========================================================
+   SCROLLBAR PERSONALIZADO
+   ========================================================= */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(91, 156, 246, 0.3);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(91, 156, 246, 0.55);
+}
+/* =========================================================
+   GESTIÓN Y DETALLE DE ESPACIOS
+   ========================================================= */
+
+/* Variante de color para el título de esta vista */
+.title-espacios {
+    color: #6a9fc0;
+    -webkit-text-stroke: 0;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 40px;
+    text-shadow: none;
+}
+
+/* Grid de tarjetas */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+/* Tarjeta de espacio */
+.espacio-card {
+    background: rgba(22, 27, 34, 0.9);
+    border: 1px solid rgba(74, 127, 165, 0.3);
+    border-radius: 15px;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.espacio-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 18px rgba(74, 127, 165, 0.15);
+    border-color: #3a8f6e;
+}
+
+/* Cabecera de la tarjeta */
+.espacio-card__header {
+    background: rgba(74, 127, 165, 0.07);
+    padding: 15px;
+    border-bottom: 1px solid rgba(74, 127, 165, 0.18);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.espacio-card__nombre {
+    color: #6a9fc0;
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+}
+
+.espacio-card__id {
+    color: #3a8f6e;
+    font-size: 0.8rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Cuerpo de la tarjeta */
+.espacio-card__body {
+    padding: 20px;
+}
+
+/* Especificaciones técnicas */
+.espacio-card__specs {
+    margin-bottom: 20px;
+}
+
+.espacio-card__specs-label {
+    color: #768a9e;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.espacio-card__specs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: #a3b5c5;
+    font-size: 0.9rem;
+}
+
+.espacio-card__specs-list li {
+    margin-bottom: 8px;
+}
+
+/* Pie de tarjeta */
+.espacio-card__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid rgba(74, 127, 165, 0.1);
+}
+
+.espacio-card__disponibilidad-label {
+    display: block;
+    color: #768a9e;
+    font-size: 0.75rem;
+}
+
+.espacio-card__estado {
+    font-weight: 700;
+}
+
+.espacio-card__estado--operativo {
+    color: #3a8f6e;
+}
+
+.espacio-card__estado--mantenimiento {
+    color: #a8444f;
+}
+
+/* Botón VER MAPA */
+.espacio-card__btn-mapa {
+    padding: 8px 15px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    border-radius: 5px;
+    background: #2d7a5f;
+    color: #cdd9e5;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Estado vacío */
+.espacio-card--vacio {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px;
+    border-style: dashed;
+    opacity: 0.6;
+}
+
+.espacio-card--vacio__texto {
+    color: #768a9e;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* =========================================================
+   PRÓXIMOS EVENTOS
+   ========================================================= */
+
+/* Variante de color para el título de esta vista */
+.title-eventos {
+    color: #6a9fc0;
+    -webkit-text-stroke: 0;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 30px;
+    text-shadow: none;
+}
+
+/* Tarjeta de evento */
+.evento-card {
+    background: rgba(22, 27, 34, 0.9);
+    border: 1px solid rgba(74, 127, 165, 0.3);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.evento-card:hover {
+    border-color: #3a8f6e;
+    box-shadow: 0 4px 16px rgba(58, 143, 110, 0.15);
+    transform: translateY(-3px);
+}
+
+.evento-card__nombre {
+    color: #6a9fc0;
+    font-family: 'Orbitron', sans-serif;
+    margin-top: 0;
+    letter-spacing: 1px;
+}
+
+/* Bloque de fechas */
+.evento-card__fechas {
+    background: rgba(58, 143, 110, 0.08);
+    border-left: 3px solid #3a8f6e;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.evento-card__fecha {
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.evento-card__fecha--inicio {
+    color: #3a8f6e;
+}
+
+.evento-card__fecha--fin {
+    color: #a8444f;
+    margin-top: 5px;
+}
+
+/* Descripción */
+.evento-card__descripcion {
+    color: #a3b5c5;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Estado vacío */
+.evento-card--vacio {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    border-style: dashed;
+    opacity: 0.7;
+}
+
+.evento-card--vacio__icono {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.evento-card--vacio__texto {
+    color: #768a9e;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+.login-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Tarjeta central */
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 30px;
+    text-align: center;
+    background-color: rgba(22, 27, 34, 0.95);
+    border: 1px solid rgba(74, 127, 165, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Logo */
+.login-logo {
+    width: 120px;
+    height: 120px;
+    background: rgba(13, 17, 23, 0.6);
+    border-radius: 20px;
+    margin: 0 auto 15px auto;
+    overflow: hidden;
+    border: 1px solid rgba(74, 127, 165, 0.2);
+}
+
+.login-logo__img {
+    max-width: 80%;
+    height: auto;
+    width: auto;
+}
+
+/* Subtítulo */
+.login-subtitle {
+    color: #768a9e;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+}
+
+/* Botón de submit */
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+}
+
+/* Pie con enlace de registro */
+.login-footer {
+    margin-top: 25px;
+    font-size: 0.9rem;
+    color: #768a9e;
+}
+
+.login-footer__link {
+    color: #6a9fc0;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-footer__link:hover {
+    text-decoration: underline;
+}
+
+/* =========================================================
+   HISTORIAL DE RESERVAS
+   ========================================================= */
+
+/* Variante de título */
+.title-historial {
+    color: #6a9fc0;
+    -webkit-text-stroke: 0;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 30px;
+    text-shadow: none;
+}
+
+/* Contenedor de la tabla */
+.historial-wrapper {
+    padding: 10px;
+    overflow-x: auto;
+    background: rgba(22, 27, 34, 0.9);
+    border: 1px solid rgba(74, 127, 165, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Cabecera de la tabla */
+.historial-table__head tr {
+    border-bottom: 2px solid rgba(74, 127, 165, 0.4);
+}
+
+.historial-table__head th {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    color: #6a9fc0;
+    text-align: left;
+    border: none;
+    background: transparent;
+}
+
+/* Filas del cuerpo */
+.historial-table__row {
+    border-bottom: 1px solid rgba(74, 127, 165, 0.08);
+    transition: background 0.3s ease;
+}
+
+.historial-table__row td {
+    text-align: left;
+    border: none;
+    color: #a3b5c5;
+}
+
+.historial-table__row:hover td {
+    background: rgba(74, 127, 165, 0.05);
+    color: #cdd9e5;
+}
+
+/* Badge de estado */
+.historial-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.historial-badge--activa {
+    color: #3a8f6e;
+}
+
+.historial-badge--inactiva {
+    color: #a8444f;
+}
+
+/* Celda vacía */
+.historial-table__vacio {
+    padding: 40px;
+    text-align: center;
+    color: #768a9e;
+    font-style: italic;
+    border: none;
+}
+
+/* =========================================================
+   REGISTRO
+   ========================================================= */
+
+/* Título "SAGE" — variante sin logo */
+.registro-titulo {
+    color: #6a9fc0;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+    margin-top: 0;
+    margin-bottom: 5px;
+    text-shadow: none;
+}
+
+/* =========================================================
+   INFORMACIÓN DE SITIOS
+   ========================================================= */
+
+/* Variante de título */
+.title-sitios {
+    color: #6a9fc0;
+    -webkit-text-stroke: 0;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 40px;
+    text-shadow: none;
+}
+
+/* Tarjeta de sitio */
+.sitio-card {
+    background: rgba(22, 27, 34, 0.9);
+    border: 1px solid rgba(74, 127, 165, 0.3);
+    padding: 25px;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sitio-card:hover {
+    transform: scale(1.02);
+    border-color: #3a8f6e;
+    box-shadow: 0 4px 18px rgba(74, 127, 165, 0.15);
+}
+
+/* Badge de tipo (esquina superior derecha) */
+.sitio-card__badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #4a7fa5;
+    color: #cdd9e5;
+    padding: 5px 15px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    border-bottom-left-radius: 10px;
+    text-transform: uppercase;
+}
+
+/* Nombre del sitio */
+.sitio-card__nombre {
+    color: #6a9fc0;
+    margin-top: 10px;
+    font-size: 1.4rem;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+}
+
+/* Bloque de información */
+.sitio-card__info {
+    margin-top: 20px;
+    border-top: 1px solid rgba(74, 127, 165, 0.15);
+    padding-top: 15px;
+    font-size: 0.95rem;
+    color: #a3b5c5;
+    line-height: 1.8;
+}
+
+.sitio-card__dato {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sitio-card__icono {
+    color: #6a9fc0;
+}
+
+/* Dato de horario — variante destacada */
+.sitio-card__dato--horario {
+    color: #3a8f6e;
+    background: rgba(58, 143, 110, 0.08);
+    padding: 5px 10px;
+    border-radius: 5px;
+    width: fit-content;
+}
+
+/* Estado vacío */
+.sitio-card--vacio {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px;
+    border-style: dashed;
+    opacity: 0.6;
+}
+
+.sitio-card--vacio__icono {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.sitio-card--vacio__texto {
+    color: #768a9e;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* =========================================================
+   MODO CLARO — body.light
+   Activar con: document.body.classList.toggle('light')
+   ========================================================= */
+
+body.light {
+    --bg-dark:          #f0f4ff;
+    --bg-nav:           rgba(255, 255, 255, 0.95);
+    --bg-modal:         #ffffff;
+    --panel-bg:         #ffffff;
+    --sidebar-bg:       #f8faff;
+    --input-bg:         #f1f5ff;
+    --input-border:     #c5d3f0;
+
+    --neon-blue:        #2563eb;
+    --neon-blue-bright: #1d4ed8;
+    --neon-blue-dim:    rgba(37, 99, 235, 0.1);
+    --neon-glow:        0px 0px 14px rgba(37, 99, 235, 0.12), inset 0px 0px 6px rgba(37, 99, 235, 0.06);
+    --neon-glow-strong: 0px 0px 22px rgba(37, 99, 235, 0.25), inset 0px 0px 10px rgba(37, 99, 235, 0.12);
+
+    --text-main:        #0f172a;
+    --text-muted:       #475569;
+    --text-soft:        #1e3a6e;
+
+    --green:            #059669;
+    --green-glow:       0 0 12px rgba(5, 150, 105, 0.35);
+    --red:              #dc2626;
+    --red-glow:         0 0 12px rgba(220, 38, 38, 0.35);
+    --yellow:           #d97706;
+    --yellow-glow:      0 0 12px rgba(217, 119, 6, 0.35);
+
+    background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(191, 219, 254, 0.45) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 90%, rgba(199, 210, 254, 0.35) 0%, transparent 60%);
+    color: var(--text-main);
+}
+
+/* ----- Navbar ----- */
+body.light .navbar {
+    background: var(--bg-nav);
+    border-bottom-color: rgba(37, 99, 235, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+body.light .navbar-brand {
+    text-shadow: 0 0 10px rgba(5, 150, 105, 0.3);
+}
+
+/* ----- Sidebar ----- */
+body.light .sidebar {
+    background: linear-gradient(180deg, #f8faff 0%, #eef2ff 100%);
+    border-right-color: rgba(37, 99, 235, 0.15);
+    box-shadow: 6px 0 24px rgba(0, 0, 0, 0.08);
+}
+
+body.light .sidebar-divider {
+    border-top-color: rgba(37, 99, 235, 0.12);
+}
+
+/* ----- Neon box ----- */
+body.light .neon-box {
+    background-color: #ffffff;
+    border-color: rgba(37, 99, 235, 0.25);
+    box-shadow: 0 2px 16px rgba(37, 99, 235, 0.08);
+}
+
+body.light .neon-box:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 4px 24px rgba(37, 99, 235, 0.18);
+}
+
+/* ----- Title outline ----- */
+body.light .title-outline {
+    -webkit-text-stroke-color: var(--neon-blue-bright);
+    text-shadow: 0 0 30px rgba(37, 99, 235, 0.12);
+}
+
+/* ----- Tabla ----- */
+body.light .neon-table th {
+    border-color: rgba(37, 99, 235, 0.2);
+    background: rgba(37, 99, 235, 0.04);
+    color: var(--neon-blue-bright);
+}
+
+body.light .neon-table td {
+    border-color: rgba(37, 99, 235, 0.1);
+}
+
+/* ----- Inputs ----- */
+body.light .neon-input {
+    background: var(--input-bg);
+    color: var(--text-main);
+    border-color: var(--input-border);
+}
+
+body.light .neon-input::placeholder {
+    color: #94a3b8;
+}
+
+body.light .neon-input:focus {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.2);
+}
+
+body.light .espacios-controles .neon-input {
+    color-scheme: light;
+}
+
+/* ----- Modales ----- */
+body.light .modal-overlay {
+    background: rgba(15, 23, 42, 0.5);
+}
+
+body.light .modal-content {
+    background: linear-gradient(160deg, #ffffff 0%, #f8faff 100%);
+    border-color: rgba(37, 99, 235, 0.3);
+    box-shadow: 0 0 30px rgba(37, 99, 235, 0.12), 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* ----- Scrollbar ----- */
+body.light ::-webkit-scrollbar-track {
+    background: #f0f4ff;
+}
+
+body.light ::-webkit-scrollbar-thumb {
+    background: rgba(37, 99, 235, 0.25);
+}
+
+body.light ::-webkit-scrollbar-thumb:hover {
+    background: rgba(37, 99, 235, 0.45);
+}
+
+/* ----- Capsule menu ----- */
+body.light .capsule-btn.inactive {
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+/* ----- PC nodes ----- */
+body.light .pc-node {
+    background: rgba(240, 244, 255, 0.8);
+    border-color: rgba(37, 99, 235, 0.2);
+}
+
+/* ----- Portal cards ----- */
+body.light .portal-card {
+    background: #ffffff;
+    border-color: rgba(37, 99, 235, 0.25);
+    box-shadow: 0 2px 12px rgba(37, 99, 235, 0.08);
+    color: var(--text-main);
+}
+
+body.light .portal-card:hover {
+    box-shadow: 0 4px 24px rgba(37, 99, 235, 0.2);
+}
+
+/* ----- Espacios frente ----- */
+body.light .espacios-frente {
+    background: rgba(37, 99, 235, 0.05);
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+/* ---- Vistas de página completa (login / registro) ---- */
+body.light.login-body {
+    background-color: #e8eeff;
+}
+
+body.light .login-card {
+    background-color: #ffffff;
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 0 24px rgba(37, 99, 235, 0.15);
+}
+
+body.light .login-logo {
+    background: rgba(240, 244, 255, 0.8);
+    border-color: rgba(37, 99, 235, 0.2);
+}
+
+body.light .login-subtitle,
+body.light .login-footer {
+    color: #4a5f72;
+}
+
+body.light .login-footer__link {
+    color: var(--neon-blue);
+}
+
+body.light .registro-titulo {
+    color: var(--neon-blue-bright);
+    text-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+}
+
+/* ----- Espacios cards ----- */
+body.light .espacio-card {
+    background: #ffffff;
+    border-color: rgba(37, 99, 235, 0.3);
+}
+
+body.light .espacio-card__header {
+    background: rgba(37, 99, 235, 0.05);
+    border-bottom-color: rgba(37, 99, 235, 0.15);
+}
+
+body.light .espacio-card__nombre  { color: var(--neon-blue-bright); }
+body.light .espacio-card__specs-label,
+body.light .espacio-card__disponibilidad-label { color: #5a6f82; }
+body.light .espacio-card__specs-list { color: #1e293b; }
+
+/* ----- Eventos cards ----- */
+body.light .evento-card {
+    background: #ffffff;
+    border-color: rgba(37, 99, 235, 0.3);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+body.light .evento-card__nombre { color: var(--neon-blue-bright); }
+
+body.light .evento-card__fechas {
+    background: rgba(5, 150, 105, 0.07);
+}
+
+body.light .evento-card__descripcion { color: #334155; }
+
+body.light .evento-card--vacio__texto,
+body.light .espacio-card--vacio__texto,
+body.light .sitio-card--vacio__texto,
+body.light .historial-table__vacio { color: #5a6f82; }
+
+/* ----- Historial ----- */
+body.light .historial-wrapper {
+    background: #ffffff;
+    border-color: rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+body.light .historial-table__head tr {
+    border-bottom-color: rgba(37, 99, 235, 0.4);
+}
+
+body.light .historial-table__head th { color: var(--neon-blue-bright); }
+body.light .historial-table__row td  { color: #1e293b; }
+
+body.light .historial-table__row {
+    border-bottom-color: rgba(37, 99, 235, 0.08);
+}
+
+body.light .historial-table__row:hover td {
+    background: rgba(37, 99, 235, 0.04);
+    color: #0f172a;
+}
+
+/* ----- Sitios cards ----- */
+body.light .sitio-card {
+    background: #ffffff;
+    border-color: rgba(37, 99, 235, 0.3);
+}
+
+body.light .sitio-card__badge {
+    background: var(--neon-blue);
+    color: #ffffff;
+}
+
+body.light .sitio-card__nombre  { color: var(--neon-blue-bright); }
+body.light .sitio-card__icono   { color: var(--neon-blue); }
+body.light .sitio-card__info    { color: #1e293b; border-top-color: rgba(37, 99, 235, 0.15); }
+
+body.light .sitio-card__dato--horario {
+    background: rgba(5, 150, 105, 0.08);
+}
+
+/* ----- Títulos de vista (variantes con color fijo) ----- */
+body.light .title-espacios,
+body.light .title-eventos,
+body.light .title-historial,
+body.light .title-sitios {
+    color: var(--neon-blue-bright);
+    text-shadow: none;
+}
+
+/* =========================================================
+   BOTÓN TOGGLE DE MODO CLARO
+   Añadir en la navbar: <button class="theme-toggle" ...>
+   ========================================================= */
+.theme-toggle {
+    background: transparent;
+    border: 1px solid rgba(74, 127, 165, 0.35);
+    color: var(--neon-blue);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.theme-toggle:hover {
+    background: var(--neon-blue-dim);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 8px rgba(74, 127, 165, 0.15);
+}
+
+body.light .theme-toggle {
+    border-color: rgba(37, 99, 235, 0.35);
+    color: var(--neon-blue-bright);
+}
+
+body.light .theme-toggle:hover {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: var(--neon-blue);
+}
+
+/*--------------------------------------------------------*/
+
+/* =========================================================
+   VARIABLES — reemplaza/actualiza en tu :root existente
+   ========================================================= */
+:root {
+    --green: #3dba8a;
+    --green-dim: rgba(61, 186, 138, 0.12);
+    --green-glow: 0 0 14px rgba(61, 186, 138, 0.45);
+    --red: #e05a6a;
+    --red-dim: rgba(224, 90, 106, 0.12);
+    --red-glow: 0 0 14px rgba(224, 90, 106, 0.4);
+}
+ 
+/* =========================================================
+   MAPA DE ESPACIOS — CONTROLES
+   ========================================================= */
+.espacios-controles {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+ 
+.espacios-controles .neon-input {
+    margin: 0;
+    color-scheme: dark;
+}
+ 
+.espacios-controles__select { width: 280px; }
+.espacios-controles__date   { width: 160px; }
+ 
+/* =========================================================
+   LAYOUT: MAPA + LEYENDA
+   ========================================================= */
+.espacios-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+ 
+/* =========================================================
+   PANEL MAPA
+   ========================================================= */
+.espacios-mapa {
+    flex-grow: 1;
+    padding: 24px;
+    background: rgba(12, 18, 30, 0.85);
+}
+ 
+/* =========================================================
+   PIZARRÓN / FRENTE
+   ========================================================= */
+.espacios-frente {
+    background: rgba(74, 127, 165, 0.10);
+    border: 1.5px dashed rgba(91, 156, 246, 0.55);
+    border-radius: 8px;
+    text-align: center;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+ 
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    color: var(--neon-blue-bright);
+ 
+    box-shadow: 0 0 18px rgba(74, 127, 165, 0.12),
+                inset 0 0 12px rgba(74, 127, 165, 0.06);
+}
+ 
+/* =========================================================
+   GRID DE PCs
+   ========================================================= */
 .lab-grid {
-    display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
 }
+ 
 .pc-node {
-    height: 60px; background: rgba(11, 16, 26, 0.6); border: 2px solid rgba(123, 162, 248, 0.3); 
-    border-radius: 5px; display: flex; justify-content: center; align-items: center; 
-    font-weight: 600; cursor: pointer; transition: 0.3s; color: var(--text-main);
+    height: 70px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.88rem;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    font-family: 'Orbitron', sans-serif;
+    user-select: none;
 }
-.pc-node.available { border-color: #4ade80; color: #4ade80; }
-.pc-node.available:hover { background: rgba(74, 222, 128, 0.1); box-shadow: 0 0 10px rgba(74, 222, 128, 0.4); transform: scale(1.05); }
-.pc-node.occupied { border-color: #f87171; color: #f87171; cursor: not-allowed; opacity: 0.5; }
-.pc-node.selected { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); box-shadow: var(--neon-glow); } 
-
-
-        .logo-wrapper {
-            width: 170px;
-            height: 170px;
-            background: var(--bg-gray);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 25px auto 25px;
-        }
-
-        .logo-img {
-            width: 250px;
-            height: auto;
-        }
+ 
+/* ── DISPONIBLE (verde) ── */
+.pc-node.available {
+    background: var(--green-dim);
+    border: 2px solid var(--green);
+    color: var(--green);
+}
+ 
+.pc-node.available:hover {
+    background: rgba(61, 186, 138, 0.20);
+    box-shadow: var(--green-glow);
+    transform: translateY(-2px) scale(1.03);
+    border-color: #5ddcaa;
+    color: #5ddcaa;
+}
+ 
+/* ── OCUPADO (rojo) ── */
+.pc-node.occupied {
+    background: var(--red-dim);
+    border: 2px solid var(--red);
+    color: var(--red);
+    cursor: not-allowed;
+    opacity: 1; /* sobreescribe el 0.45 anterior */
+}
+ 
+/* ── SELECCIONADO (azul) ── */
+.pc-node.selected-node {
+    background: rgba(91, 156, 246, 0.22);
+    border: 2px solid var(--neon-blue-bright);
+    color: #fff;
+    box-shadow: var(--neon-glow-strong);
+    transform: scale(1.04);
+}
+ 
+/* =========================================================
+   LEYENDA
+   ========================================================= */
+.espacios-leyenda {
+    width: 200px;
+    padding: 22px 20px;
+    background: rgba(12, 18, 30, 0.85);
+    flex-shrink: 0;
+}
+ 
+.leyenda-titulo {
+    margin: 0 0 20px;
+    color: var(--text-main);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+}
+ 
+.leyenda-item {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+ 
+.leyenda-item:last-child { margin-bottom: 0; }
+ 
+/* Puntos cuadrados con glow */
+.leyenda-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+ 
+.leyenda-dot--green { background: var(--green); box-shadow: 0 0 8px rgba(61, 186, 138, 0.5); }
+.leyenda-dot--red   { background: var(--red);   box-shadow: 0 0 8px rgba(224, 90, 106, 0.5); }
+.leyenda-dot--blue  { background: var(--neon-blue); box-shadow: 0 0 8px rgba(74, 127, 165, 0.5); }
+ 
+/* =========================================================
+   MODAL DE RESERVA — variante verde
+   ========================================================= */
+.modal-content--green {
+    border-color: rgba(61, 186, 138, 0.5);
+    box-shadow: 0 0 24px rgba(61, 186, 138, 0.12), 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+ 
+.modal-title--green {
+    color: var(--green);
+    font-family: 'Orbitron', sans-serif;
+    text-align: left;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+ 
+.reserva-equipo-label  { color: var(--text-muted); margin: 0 0 6px; font-size: 0.9rem; }
+.reserva-equipo-valor  { color: var(--neon-blue-bright); font-size: 1.2rem; font-weight: 700; }
+.reserva-horario-info  { color: var(--green); font-size: 0.85rem; margin: 0 0 20px; }
+ 
+.reserva-horas         { display: flex; gap: 10px; margin-bottom: 25px; }
+.reserva-horas-campo   { flex: 1; }
+ 

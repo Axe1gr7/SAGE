@@ -1,37 +1,68 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<h1 class="title-outline" style="color: #7ba2f8; font-family: 'Orbitron', sans-serif; margin-bottom: 30px; text-shadow: 0 0 10px rgba(123, 162, 248, 0.4);">
+<h1 class="title-outline title-historial">
     HISTORIAL DE RESERVAS
 </h1>
 
-<div class="neon-box" style="padding: 10px; overflow-x: auto; background: rgba(17, 24, 39, 0.8); border: 1px solid #7ba2f8; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
-    <table class="neon-table" style="width: 100%; border-collapse: collapse; color: #e2e8f0; text-align: left;">
-        <thead>
-            <tr style="border-bottom: 2px solid #7ba2f8; font-family: 'Orbitron'; font-size: 0.85rem; color: #7ba2f8;">
-                <th style="padding: 15px;">FECHA</th>
-                <th style="padding: 15px;">HORARIO</th>
-                <th style="padding: 15px;">ESPACIO</th>
-                <th style="padding: 15px;">ESTADO</th>
-            </tr>
+<div class="neon-box historial-wrapper">
+    <table class="neon-table historial-table">
+        <thead class="historial-table__head">
+             <tr>
+                <th>FECHA</th>
+                <th>HORARIO</th>
+                <th>ESPACIO</th>
+                <th>ESTADO</th>
+                <th>ACCIONES</th>
+             </tr>
         </thead>
         <tbody>
-            {% if reservas %}
+            {% if reservas and reservas|length > 0 %}
                 {% for r in reservas %}
-                <tr style="border-bottom: 1px solid rgba(123, 162, 248, 0.1); transition: 0.3s;">
-                    <td style="padding: 15px;">{{ r.fecha }}</td>
-                    <td style="padding: 15px;">{{ r.horario }}</td>
-                    <td style="padding: 15px;">{{ r.espacio }}</td>
-                    <td style="padding: 15px; font-weight: bold; color: {% if r.estado == 'activa' %}#4ade80{% else %}#f87171{% endif %};">
-                        <span style="display: inline-block; padding: 4px 8px; border: 1px solid currentColor; border-radius: 4px; font-size: 0.75rem;">
-                            {{ r.estado | upper }}
+                <tr class="historial-table__row">
+                    {# Extraemos la fecha (YYYY-MM-DD) del string ISO #}
+                    <td>{{ r.fecha_hora_inicio[:10] if r.fecha_hora_inicio else 'N/D' }}</td>
+                    
+                    {# Formateamos el rango de horas (HH:MM) #}
+                    <td>
+                        {{ r.fecha_hora_inicio[11:16] if r.fecha_hora_inicio else '00:00' }} - 
+                        {{ r.fecha_hora_fin[11:16] if r.fecha_hora_fin else '00:00' }}
+                    </td>
+                    
+                    {# Mostramos el nombre del espacio (si está anidado) o el equipo #}
+                    <td>
+                        {% if r.espacio and r.espacio.nombre %}
+                            {{ r.espacio.nombre }}
+                        {% elif r.equipo and r.equipo.nombre_equipo %}
+                            {{ r.equipo.nombre_equipo }}
+                        {% else %}
+                            Espacio {{ r.id_espacio }}
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        {# Manejo seguro del estado (puede ser string o enum) #}
+                        {% set estado_val = r.estado %}
+                        {% if r.estado is mapping %}
+                            {% set estado_val = r.estado.value %}
+                        {% endif %}
+                        <span class="historial-badge {% if estado_val|lower == 'activa' %}historial-badge--activa{% else %}historial-badge--inactiva{% endif %}">
+                            {{ estado_val | upper }}
                         </span>
+                    </td>
+                    
+                    <td>
+                        {% if estado_val|lower == 'activa' %}
+                        <form action="{{ url_for('cancelar_reserva', reserva_id=r.id_reserva) }}" method="POST" style="display: inline;">
+                            <button type="submit" class="btn-outline-red">CANCELAR</button>
+                        </form>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td colspan="4" style="padding: 40px; text-align: center; color: #94a3b8; font-style: italic;">
+                    <td colspan="5" class="historial-table__vacio">
                         No tienes reservas registradas actualmente.
                     </td>
                 </tr>
@@ -40,10 +71,104 @@
     </table>
 </div>
 
+{# Sección de Notificaciones Toast #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="toast-notif toast-{{ category }} visible" id="toast-dinamico-{{ loop.index }}">
+                <span class="toast-notif__icono">{% if category == 'success' %}✓{% else %}✕{% endif %}</span>
+                {{ message }}
+            </div>
+            
+            <script>
+                setTimeout(function() {
+                    const toast = document.getElementById('toast-dinamico-{{ loop.index }}');
+                    if (toast) {
+                        toast.classList.remove('visible');
+                    }
+                }, 4000);
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 <style>
-    tbody tr:hover {
-        background: rgba(123, 162, 248, 0.05);
-        color: white;
-    }
+/* Estilos del Historial y Toasts (igual que los que tenías, se mantienen) */
+.toast-notif {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 14px 22px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.82rem;
+    letter-spacing: 1px;
+    opacity: 0;
+    transform: translateY(-16px);
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.toast-success {
+    background: linear-gradient(135deg, #1a2f24 0%, #0f1f18 100%);
+    border: 1px solid rgba(61, 186, 138, 0.6);
+    color: #3dba8a;
+    box-shadow: 0 0 20px rgba(61, 186, 138, 0.25), 0 8px 30px rgba(0,0,0,0.5);
+}
+
+.toast-danger {
+    background: linear-gradient(135deg, #2f1a1a 0%, #1f0f0f 100%);
+    border: 1px solid rgba(255, 76, 76, 0.6);
+    color: #ff4c4c;
+    box-shadow: 0 0 20px rgba(255, 76, 76, 0.25), 0 8px 30px rgba(0,0,0,0.5);
+}
+
+.toast-notif.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.toast-notif__icono {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.historial-table__vacio {
+    text-align: center;
+    padding: 40px !important;
+    color: #888;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.btn-outline-red {
+    background: transparent;
+    border: 1px solid #ff4c4c;
+    color: #ff4c4c;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-family: 'Orbitron', sans-serif;
+    padding: 6px 12px;
+    border-radius: 5px;
+}
+
+.btn-outline-red:hover {
+    background: #ff4c4c;
+    color: white;
+    box-shadow: 0 0 10px rgba(255, 76, 76, 0.5);
+}
 </style>
 {% endblock %}

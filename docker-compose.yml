@@ -47,18 +47,22 @@ services:
 
   # 4. Web 1: Admin Gestores (Laravel)
   admin_sage:
-    build: ./admin_laravel 
+    build: 
+      context: ./admin_laravel
+      dockerfile: Dockerfile
     container_name: admin_sage
+    # Accederás por http://localhost:8020
     ports:
       - "8020:8000" 
     volumes:
-      - ./admin_laravel:/var/www 
+      # MUY IMPORTANTE: El destino debe ser igual al WORKDIR del Dockerfile
+      - ./admin_laravel:/var/www/html 
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
       - API_URL=http://api_sage:8000 
     depends_on:
-      - api_sage 
+      - api_sage
 
 volumes:
   postgres_data:

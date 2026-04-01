@@ -1,39 +1,64 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1 class="title-outline" style="font-size: 2rem; margin-bottom: 40px; color: #7ba2f8; font-family: 'Orbitron', sans-serif; text-align: center; text-shadow: 0 0 10px rgba(123, 162, 248, 0.5);">
-        PORTAL ESTUDIANTIL
-    </h1>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 900px; margin: 0 auto;">
-        
-        <a href="{{ url_for('agendar') }}" class="neon-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; text-decoration: none; color: white; background: rgba(17, 24, 39, 0.8); border: 1px solid #7ba2f8; border-radius: 15px; transition: 0.3s; box-shadow: 0 0 10px rgba(123, 162, 248, 0.2);">
-            <span style="font-size: 2.5rem; margin-bottom: 10px;">📅</span>
-            <span style="font-size: 1.1rem; font-weight: 600; text-transform: uppercase; font-family: 'Orbitron';">Agendar Espacio</span>
+    <div class="welcome-banner" style="text-align: center; margin-bottom: 20px;">
+        <h2 style="color: #3dba8a; font-family: 'Orbitron', sans-serif;">
+            ¡HOLA, {{ user.get('user_email', 'ESTUDIANTE') | upper }}!
+        </h2>
+        <p style="color: #a0a0a0;">Bienvenido a tu panel de control SAGE</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alertas-container" style="margin-bottom: 20px;">
+                {% for category, message in messages %}
+                    <div style="background-color: {% if category == 'success' %}#1a2f24{% else %}#2f1a1a{% endif %}; border: 1px solid {% if category == 'success' %}#3dba8a{% else %}#ff4c4c{% endif %}; color: {% if category == 'success' %}#3dba8a{% else %}#ff4c4c{% endif %}; padding: 12px; border-radius: 5px; text-align: center; font-family: 'Orbitron', sans-serif;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h1 class="title-outline portal-title">PORTAL ESTUDIANTIL</h1>
+
+    <div class="portal-grid">
+
+        <a href="{{ url_for('agendar') }}" class="portal-card">
+            <span class="portal-card-icon">📅</span>
+            <span class="portal-card-label">Agendar Espacio</span>
+            <p style="font-size: 0.8rem; color: #a0a0a0; margin-top: 10px;">Reserva laboratorios y equipos</p>
         </a>
 
-        <a href="{{ url_for('mis_reservas') }}" class="neon-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; text-decoration: none; color: white; background: rgba(17, 24, 39, 0.8); border: 1px solid #7ba2f8; border-radius: 15px; transition: 0.3s; box-shadow: 0 0 10px rgba(123, 162, 248, 0.2);">
-            <span style="font-size: 2.5rem; margin-bottom: 10px;">🕒</span>
-            <span style="font-size: 1.1rem; font-weight: 600; text-transform: uppercase; font-family: 'Orbitron';">Mis Reservas</span>
+        <a href="{{ url_for('mis_reservas') }}" class="portal-card" style="position: relative;">
+            <span class="portal-card-icon">🕒</span>
+            <span class="portal-card-label">Mis Reservas</span>
+            <p style="font-size: 0.8rem; color: #a0a0a0; margin-top: 10px;">Gestiona tus horarios</p>
+            
+            <div style="position: absolute; top: 15px; right: 15px; background-color: #3dba8a; color: #000; font-weight: bold; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(61,186,138,0.5);">
+                {{ total_reservas }}
+            </div>
         </a>
 
-        <a href="{{ url_for('eventos') }}" class="neon-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; text-decoration: none; color: white; background: rgba(17, 24, 39, 0.8); border: 1px solid #7ba2f8; border-radius: 15px; transition: 0.3s; box-shadow: 0 0 10px rgba(123, 162, 248, 0.2);">
-            <span style="font-size: 2.5rem; margin-bottom: 10px;">🎟️</span>
-            <span style="font-size: 1.1rem; font-weight: 600; text-transform: uppercase; font-family: 'Orbitron';">Eventos Universitarios</span>
+        <a href="{{ url_for('eventos') }}" class="portal-card" style="position: relative;">
+            <span class="portal-card-icon">🎟️</span>
+            <span class="portal-card-label">Eventos Universitarios</span>
+            <p style="font-size: 0.8rem; color: #a0a0a0; margin-top: 10px;">Descubre qué hay de nuevo</p>
+            
+            {% if total_eventos > 0 %}
+            <div style="position: absolute; top: 15px; right: 15px; background-color: #ffb74d; color: #000; font-weight: bold; border-radius: 5px; padding: 2px 8px; font-size: 0.8rem; box-shadow: 0 0 10px rgba(255,183,77,0.5);">
+                {{ total_eventos }} Nuevos
+            </div>
+            {% endif %}
         </a>
 
-        <a href="{{ url_for('sitios') }}" class="neon-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; text-decoration: none; color: white; background: rgba(17, 24, 39, 0.8); border: 1px solid #7ba2f8; border-radius: 15px; transition: 0.3s; box-shadow: 0 0 10px rgba(123, 162, 248, 0.2);">
-            <span style="font-size: 2.5rem; margin-bottom: 10px;">📍</span>
-            <span style="font-size: 1.1rem; font-weight: 600; text-transform: uppercase; font-family: 'Orbitron';">Información de Sitios</span>
+        <a href="{{ url_for('sitios') }}" class="portal-card">
+            <span class="portal-card-icon">📍</span>
+            <span class="portal-card-label">Información de Sitios</span>
+            <p style="font-size: 0.8rem; color: #a0a0a0; margin-top: 10px;">Conoce las capacidades</p>
         </a>
 
     </div>
 
-    <style>
-        .neon-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(123, 162, 248, 0.5) !important;
-            border-color: #4ade80 !important;
-        }
-    </style>
 {% endblock %}

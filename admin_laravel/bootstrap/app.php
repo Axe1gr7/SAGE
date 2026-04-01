@@ -10,9 +10,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
+    ->withMiddleware(function (Middleware $middleware) {
+        // Registramos el alias para que las rutas reconozcan 'admin.auth'
+        $middleware->alias([
+            'admin.auth' => \App\Http\Middleware\AdminAuth::class,
+        ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
