@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.data.database import get_db
 from app.models.SAGE_BD import Estudiante
 from app.schemas.estudiante import EstudianteCreate, EstudianteUpdate, EstudianteResponse
-from app.auth import get_current_admin, get_password_hash
+from app.auth import get_current_admin, get_current_user, get_password_hash
 
 router = APIRouter(prefix="/estudiantes", tags=["Estudiantes (admin)"])
 
@@ -43,8 +43,12 @@ async def create_estudiante(
 async def get_estudiante(
     id: int,
     db: Session = Depends(get_db),
-    current_admin = Depends(get_current_admin)
+    current_user = Depends(get_current_user)
 ):
+    # Prevención BOLA/IDOR: Si es estudiante, solo puede ver su propio perfil
+    if current_user.__class__.__name__ == "Estudiante" and current_user.id_estudiante != id:
+        raise HTTPException(403, "No tienes permiso para acceder a este recurso")
+
     est = db.query(Estudiante).filter(Estudiante.id_estudiante == id, Estudiante.estatus == 0).first()
     if not est:
         raise HTTPException(404, "Estudiante no encontrado")
@@ -55,8 +59,12 @@ async def update_estudiante(
     id: int,
     est_update: EstudianteUpdate,
     db: Session = Depends(get_db),
-    current_admin = Depends(get_current_admin)
+    current_user = Depends(get_current_user)
 ):
+    # Prevención BOLA/IDOR: Si es estudiante, solo puede actualizar su propio perfil
+    if current_user.__class__.__name__ == "Estudiante" and current_user.id_estudiante != id:
+        raise HTTPException(403, "No tienes permiso para actualizar este recurso")
+
     db_est = db.query(Estudiante).filter(Estudiante.id_estudiante == id, Estudiante.estatus == 0).first()
     if not db_est:
         raise HTTPException(404, "Estudiante no encontrado")

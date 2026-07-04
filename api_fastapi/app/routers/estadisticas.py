@@ -3,8 +3,13 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.data.database import get_db
 from app.models.SAGE_BD import Reserva, Espacio, Modulo
+from app.auth import get_api_key
 
-router = APIRouter(prefix="/estadisticas", tags=["Estadísticas"])
+router = APIRouter(
+    prefix="/estadisticas", 
+    tags=["Estadísticas"], 
+    dependencies=[Depends(get_api_key)]
+)
 
 @router.get("/espacios-mas-reservados")
 def espacios_mas_reservados(db: Session = Depends(get_db)):

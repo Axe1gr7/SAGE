@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -6,23 +7,23 @@ class ClaseBase(BaseModel):
     materia: str
     grupo: str
     docente: str
-    correo_docente: str | None = None
-    horario: str | None = None
-    id_administrador: int | None = None
-    id_espacio_asignado: int | None = None
+    correo_docente: Optional[str] = None
+    horario: Optional[str] = None
+    id_administrador: Optional[int] = None
+    id_espacio_asignado: Optional[int] = None
 
 class ClaseCreate(ClaseBase):
     pass
 
 class ClaseUpdate(BaseModel):
-    nombre: str | None = None
-    materia: str | None = None
-    grupo: str | None = None
-    docente: str | None = None
-    correo_docente: str | None = None
-    horario: str | None = None
-    id_administrador: int | None = None
-    id_espacio_asignado: int | None = None
+    nombre: Optional[str] = None
+    materia: Optional[str] = None
+    grupo: Optional[str] = None
+    docente: Optional[str] = None
+    correo_docente: Optional[str] = None
+    horario: Optional[str] = None
+    id_administrador: Optional[int] = None
+    id_espacio_asignado: Optional[int] = None
 
 class ClaseResponse(ClaseBase):
     id_clase: int

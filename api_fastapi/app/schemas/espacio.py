@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime, time
 
@@ -14,13 +15,13 @@ class EspacioCreate(EspacioBase):
     pass
 
 class EspacioUpdate(BaseModel):
-    tipo_espacio: str | None = None
-    nombre: str | None = None
-    ubicacion: str | None = None
-    capacidad: int | None = None
-    horario_apertura: time | None = None
-    horario_cierre: time | None = None
-    disponible: bool | None = None
+    tipo_espacio: Optional[str] = None
+    nombre: Optional[str] = None
+    ubicacion: Optional[str] = None
+    capacidad: Optional[int] = None
+    horario_apertura: Optional[time] = None
+    horario_cierre: Optional[time] = None
+    disponible: Optional[bool] = None
 
 class EspacioResponse(EspacioBase):
     id_espacio: int

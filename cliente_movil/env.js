@@ -3,5 +3,16 @@
 
 // Copia la info de env.example.js y ajusta la IP/puerto.
 
-export const API_URL = 'http://192.168.1.50:8080';
+// Ejecutando el móvil localmente (sin docker) necesitas que la API sea accesible
+// desde el dispositivo/emu:
+// - Si usas Android Emulator/iOS Simulator a veces sirve localhost.
+// - En físico usa la IP LAN de tu PC (misma red WiFi).
+//
+// Ajusta la URL según corresponda.
+// En iOS/Android en dispositivo/emulador, `localhost` apunta al propio dispositivo.
+// En Expo Go/Simulators normalmente funciona, pero si falla, usa IP LAN de tu Mac.
+// Cambia la IP 192.168.x.x según tu red.
+export const API_URL = 'http://192.168.0.129:8080';
+
+
 

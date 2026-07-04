@@ -1,68 +1,57 @@
+version: '3.8'
+
 services:
-  # 1. Base de Datos (PostgreSQL)
-  postgres:
+  db:
     image: postgres:15
-    container_name: ServerPostgreSql-SAGE
-    restart: always
+    container_name: sage_postgres
     environment:
       POSTGRES_USER: SAGE
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: DB_SAGE
     ports:
       - "5433:5432"
+    networks:
+      - sage_network
+    restart: unless-stopped
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U SAGE -d DB_SAGE"]
-      interval: 5s
-      retries: 5
-      timeout: 5s
+      - sage_pgdata:/var/lib/postgresql/data
 
-  # 2. Tu API Central (FastAPI)
-  api_sage:
-    build: ./api_fastapi  
-    container_name: fastapi_api_sage
+  api_fastapi:
+    build:
+      context: ./api_fastapi
+      dockerfile: dockerfile
+    container_name: sage_api_fastapi
     ports:
-      - "8000:8000"
-    volumes:
-      - ./api_fastapi:/app 
+      # CAMBIADO a 8080 para evitar conflictos con otras apps
+      - "8080:8000"
     environment:
-      - DATABASE_URL=postgresql://SAGE:1234@ServerPostgreSql-SAGE:5432/DB_SAGE
+      - DATABASE_URL=postgresql://SAGE:1234@db:5432/DB_SAGE
     depends_on:
-      postgres:
-        condition: service_healthy 
+      - db
+    networks:
+      - sage_network
+    restart: unless-stopped
 
-  # 3. Web 2: Cliente Estudiantes (Flask)
-  cliente_sage:
-    build: ./cliente_flask 
-    container_name: flask_cliente_sage
-    ports:
-      - "5040:5040"
-    volumes:
-      - ./cliente_flask:/app 
-    depends_on:
-      - api_sage 
-    environment:
-      - API_URL=http://api_sage:8000 
-
-  # 4. Web 1: Admin Gestores (Laravel)
-  admin_sage:
-    build: 
-      context: ./admin_laravel
+  admin_flask:
+    build:
+      context: ./admin_flask
       dockerfile: Dockerfile
-    container_name: admin_sage
-    # Accederás por http://localhost:8020
+    container_name: sage_admin_flask
     ports:
-      - "8020:8000" 
-    volumes:
-      # MUY IMPORTANTE: El destino debe ser igual al WORKDIR del Dockerfile
-      - ./admin_laravel:/var/www/html 
+      - "5050:5050"
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
-      - API_URL=http://api_sage:8000 
+      - API_URL=http://api_fastapi:8000
     depends_on:
-      - api_sage
+      - api_fastapi
+    networks:
+      - sage_network
+    restart: unless-stopped
+
+
+
+networks:
+  sage_network:
+    driver: bridge
 
 volumes:
-  postgres_data:
+  sage_pgdata:

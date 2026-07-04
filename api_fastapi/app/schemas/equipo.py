@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime
 from app.models.SAGE_BD import EstadoOperativo
@@ -12,9 +13,9 @@ class EquipoCreate(EquipoBase):
     pass
 
 class EquipoUpdate(BaseModel):
-    nombre_equipo: str | None = None
-    tipo_equipo: str | None = None
-    estado_operativo: EstadoOperativo | None = None
+    nombre_equipo: Optional[str] = None
+    tipo_equipo: Optional[str] = None
+    estado_operativo: Optional[EstadoOperativo] = None
 
 class EquipoResponse(EquipoBase):
     id_equipo: int

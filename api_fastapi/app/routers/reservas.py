@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import cast, Date
@@ -17,15 +18,15 @@ router = APIRouter(prefix="/reservas", tags=["Reservas"])
 # Nuevo esquema para reserva de estudiante
 class ReservaEstudianteCreate(BaseModel):
     id_espacio: int
-    id_equipo: int | None = None
+    id_equipo: Optional[int] = None
     id_modulo: int
     fecha: date_type          # solo el día (YYYY-MM-DD)
-    observaciones: str | None = None
+    observaciones: Optional[str] = None
 
 def verificar_disponibilidad(
     db: Session,
     id_espacio: int,
-    id_equipo: int | None,
+    id_equipo: Optional[int],
     inicio: datetime,
     fin: datetime,
     exclude_id: int = None
@@ -46,9 +47,9 @@ def verificar_disponibilidad(
 def validar_beneficiario_segun_tipo(
     db: Session,
     tipo: TipoReserva,
-    estudiante_id: int | None,
-    clase_id: int | None,
-    evento_id: int | None
+    estudiante_id: Optional[int],
+    clase_id: Optional[int],
+    evento_id: Optional[int]
 ):
     if tipo == TipoReserva.ESTUDIANTE:
         if not estudiante_id or clase_id or evento_id:
@@ -105,6 +106,56 @@ async def get_ocupacion(
         })
 
     return {"ocupacion": ocupacion}
+
+@router.get("/espacios/{espacio_id}/modulos-disponibles")
+async def get_modulos_disponibles_espacio(
+    espacio_id: int,
+    fecha: date_type = Query(...),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Devuelve los módulos libres para un espacio (cuando se reserva el espacio completo, sin equipo).
+    """
+    espacio = db.query(Espacio).filter(Espacio.id_espacio == espacio_id, Espacio.estatus == 0).first()
+    if not espacio:
+        raise HTTPException(404, "Espacio no encontrado")
+
+    modulos_db = db.query(Modulo).filter(Modulo.estatus == 0).order_by(Modulo.hora_inicio).all()
+    reservas = db.query(Reserva).filter(
+        Reserva.id_espacio == espacio_id,
+        Reserva.id_equipo == None, # Buscamos reservas de espacio completo
+        cast(Reserva.fecha_hora_inicio, Date) == fecha,
+        Reserva.estado == EstadoReserva.ACTIVA,
+        Reserva.estatus == 0
+    ).all()
+
+    modulos_libres = []
+    for mod in modulos_db:
+        inicio_mod = datetime.combine(fecha, mod.hora_inicio)
+        fin_mod = datetime.combine(fecha, mod.hora_fin)
+        ocupado = any(r.fecha_hora_inicio < fin_mod and r.fecha_hora_fin > inicio_mod for r in reservas)
+        
+        if not ocupado:
+            modulos_libres.append({
+                "id_modulo": mod.id_modulo,
+                "nombre": getattr(mod, 'nombre', f"Módulo {mod.id_modulo}"),
+                "hora_inicio": mod.hora_inicio.strftime("%H:%M"),
+                "hora_fin": mod.hora_fin.strftime("%H:%M")
+            })
+
+    return {"modulos": modulos_libres}
+
+@router.get("/modulos")
+async def get_todos_modulos(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Devuelve todos los módulos configurados en el sistema.
+    """
+    modulos = db.query(Modulo).filter(Modulo.estatus == 0).order_by(Modulo.hora_inicio).all()
+    return [{"id_modulo": mod.id_modulo, "nombre": mod.nombre, "hora_inicio": mod.hora_inicio.strftime("%H:%M"), "hora_fin": mod.hora_fin.strftime("%H:%M")} for mod in modulos]
 
 @router.get("/equipos/{equipo_id}/modulos-disponibles")
 async def get_modulos_disponibles(

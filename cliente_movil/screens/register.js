@@ -5,8 +5,29 @@ import BrandBackground from '../components/BrandBackground';
 import LiquidButton from '../components/LiquidButton';
 import { API_URL } from '../env';
 
-// evita quedarse “cargando” por init; muestra loader 2s mínimo
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+console.log('RegisterScreen API_URL:', API_URL);
+
+const fetchWithTimeout = async (url, options = {}, ms = 20000) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), ms);
+
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    return res;
+  } catch (e) {
+    console.warn('register fetchWithTimeout error:', e?.name, e?.message);
+    if (e?.name === 'AbortError') {
+      throw new Error(`Timeout: ${ms}ms. Revisa conectividad/IP o que el backend esté respondiendo.`);
+    }
+    // En RN/Expo, errores de red suelen ser TypeError: Network request failed
+    if (e instanceof TypeError) {
+      throw new Error(`No se pudo conectar al servidor (${API_URL}). Verifica IP/puerto y que FastAPI esté corriendo.`);
+    }
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
 
 /*zona2: main - hogar de los componentes */
 export default function RegisterScreen({ navigate, theme }) {
@@ -14,6 +35,8 @@ export default function RegisterScreen({ navigate, theme }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [matricula, setMatricula] = useState('');
+  // Debe coincidir con el enum CarreraEnum del backend (strings exactos)
+  // En backend: 'sistemas', 'mecatronica', 'ingenieria de datos', ...
   const [carrera, setCarrera] = useState('sistemas');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,26 +57,34 @@ export default function RegisterScreen({ navigate, theme }) {
         carrera: carrera
       };
 
-      const response = await fetch(`${API_URL}/auth/registro`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      const response = await fetchWithTimeout(
+        `${API_URL}/auth/registro`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        },
+        8000
+      );
 
-      const data = await response.json();
-      
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        const txt = await response.text().catch(() => '');
+        data = txt ? { detail: txt } : null;
+      }
+
       if (!response.ok) {
-        throw new Error(data.detail || "Error al registrarse");
+        throw new Error(data?.detail || 'Error al registrarse');
       }
 
       Alert.alert("Registro Exitoso", "Tu cuenta ha sido creada. Inicia sesión.", [
         { text: "Aceptar", onPress: () => navigate('Login') }
       ]);
-
     } catch (error) {
-      Alert.alert("Error", error.message);
+      Alert.alert("Error", error?.message || "Error desconocido");
     } finally {
-      await sleep(2000);
       setLoading(false);
     }
   };

@@ -1,20 +1,21 @@
+from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime
 
 class EventoBase(BaseModel):
     nombre: str
-    descripcion: str | None = None
-    fecha_inicio: datetime | None = None
-    fecha_fin: datetime | None = None
+    descripcion: Optional[str] = None
+    fecha_inicio: Optional[datetime] = None
+    fecha_fin: Optional[datetime] = None
 
 class EventoCreate(EventoBase):
     pass
 
 class EventoUpdate(BaseModel):
-    nombre: str | None = None
-    descripcion: str | None = None
-    fecha_inicio: datetime | None = None
-    fecha_fin: datetime | None = None
+    nombre: Optional[str] = None
+    descripcion: Optional[str] = None
+    fecha_inicio: Optional[datetime] = None
+    fecha_fin: Optional[datetime] = None
 
 class EventoResponse(EventoBase):
     id_evento: int

@@ -1,16 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.data.database import get_db
 from app.models.SAGE_BD import Estudiante, Administrador
 from app.schemas.token import Token
 from app.schemas.estudiante import EstudianteCreate, EstudianteResponse
-from app.auth import authenticate_user, create_access_token, get_password_hash
+from app.auth import authenticate_user, create_access_token, get_password_hash, limiter, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
 
 @router.post("/login", response_model=Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     
     # 1. Intentamos buscarlo primero como estudiante
     role = "estudiante"
@@ -39,7 +40,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/registro", response_model=EstudianteResponse)
-async def registrar_estudiante(estudiante: EstudianteCreate, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+async def registrar_estudiante(request: Request, estudiante: EstudianteCreate, db: Session = Depends(get_db)):
     if db.query(Estudiante).filter(Estudiante.matricula == estudiante.matricula).first():
         raise HTTPException(status_code=400, detail="Matrícula ya registrada")
     if db.query(Estudiante).filter(Estudiante.correo == estudiante.correo).first():
@@ -57,3 +59,29 @@ async def registrar_estudiante(estudiante: EstudianteCreate, db: Session = Depen
     db.commit()
     db.refresh(db_est)
     return db_est
+
+@router.get("/me")
+async def get_me(current_user = Depends(get_current_user)):
+    """Devuelve datos del usuario autenticado para el cliente móvil."""
+
+    # El móvil espera una estructura con keys como nombre_completo, correo,
+    # y en caso de estudiante: matricula y carrera.
+    if isinstance(current_user, Administrador):
+        return {
+            "id": current_user.id_administrador,
+            "role": "admin",
+            "nombre_completo": current_user.nombre_completo,
+            "correo": current_user.correo,
+            "puesto": current_user.puesto,
+        }
+
+    return {
+        "id": current_user.id_estudiante,
+        "role": "estudiante",
+        "id_estudiante": current_user.id_estudiante,
+        "nombre_completo": current_user.nombre_completo,
+        "correo": current_user.correo,
+        "matricula": current_user.matricula,
+        # Si viene null, regresamos null; si es Enum, devolvemos su string.
+        "carrera": current_user.carrera.value if current_user.carrera else None,
+    }

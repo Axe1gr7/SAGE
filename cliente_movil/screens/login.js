@@ -4,11 +4,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather } from '@expo/vector-icons';
 import BrandBackground from '../components/BrandBackground';
 import LiquidButton from '../components/LiquidButton';
-import { AuthContext } from '../App';
+import { AuthContext } from '../contexts/AuthContext';
 import { API_URL } from '../env';
 
-// evita quedarse “cargando” por init; muestra loader 2s mínimo
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const fetchWithTimeout = async (url, options = {}, ms = 20000) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), ms);
+
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    return res;
+  } catch (e) {
+    console.warn('login fetchWithTimeout error:', e?.name, e?.message);
+    if (e?.name === 'AbortError') {
+      throw new Error(`Timeout: ${ms}ms. Revisa conectividad/IP o que el backend esté respondiendo.`);
+    }
+    if (e instanceof TypeError) {
+      throw new Error(`No se pudo conectar al servidor (${API_URL}). Verifica IP/puerto y que FastAPI esté corriendo.`);
+    }
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
 
 /*zona2: main - hogar de los componentes */
 export default function LoginScreen({ navigate, theme }) {
@@ -26,47 +44,47 @@ export default function LoginScreen({ navigate, theme }) {
     
     setLoading(true);
     try {
-      // Usar form data porque el endpoint de FastAPI OAuth2PasswordRequestForm espera form-urlencoded
       const formData = new URLSearchParams();
       formData.append('username', email);
       formData.append('password', password);
-      // El scope por defecto para estudiantes podría omitirse o enviarse según lo requiera tu backend
-      
-      const response = await fetch(`${API_URL}/auth/login`, {
+
+      const response = await fetchWithTimeout(`${API_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData.toString()
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.detail || "Credenciales incorrectas");
+      }, 20000);
+
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        const txt = await response.text().catch(() => '');
+        data = txt ? { detail: txt } : null;
       }
-      
-      // Guardar en AsyncStorage
-      await AsyncStorage.setItem('userToken', data.access_token);
-      
-      // Fetch user profile
-      const meResponse = await fetch(`${API_URL}/auth/me`, {
-        headers: { 'Authorization': `Bearer ${data.access_token}` }
-      });
+
+      if (!response.ok) {
+        throw new Error(data?.detail || "Credenciales incorrectas");
+      }
+
+      const token = data.access_token;
+      await AsyncStorage.setItem('userToken', token);
+
+      const meResponse = await fetchWithTimeout(`${API_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }, 20000);
+
       if (meResponse.ok) {
         const userInfo = await meResponse.json();
-        setUserToken(data.access_token);
+        setUserToken(token);
         setUserData(userInfo);
       } else {
-        setUserToken(data.access_token);
+        setUserToken(token);
       }
-      
+
       navigate('Dashboard');
     } catch (error) {
-      Alert.alert("Error de inicio de sesión", error.message);
+      Alert.alert("Error de inicio de sesión", error?.message || "Error desconocido");
     } finally {
-      // mínimo para que no se sienta “congelado”, pero no ocultar el loader si se quedó en espera
-      await sleep(2000);
       setLoading(false);
     }
   };

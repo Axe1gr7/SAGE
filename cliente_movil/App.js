@@ -16,17 +16,19 @@ import MisReservasScreen from './screens/mis_reservas';
 import PerfilScreen from './screens/perfil'; // NUEVO - Pantalla de Perfil
 
 import * as SplashScreen from 'expo-splash-screen';
+import { AuthContext } from './contexts/AuthContext';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 // Contexto para el Tema (Oscuro/Claro) y Autenticación
 export const ThemeContext = createContext();
-export const AuthContext = createContext();
 
 // URL base de la API FastAPI (debe ser accesible desde el dispositivo)
 // IMPORTANTE: no uses localhost/127.0.0.1 en un celular físico.
 import { API_URL } from './env';
+
+console.log('App API_URL:', API_URL);
 
 /*zona2: main - hogar de los componentes */
 export default function App() {
@@ -44,26 +46,52 @@ export default function App() {
 
   React.useEffect(() => {
     async function prepare() {
+      // Timeout fuerte para que la pantalla NO se quede cargando
+      const fetchWithTimeout = (url, options = {}, ms = 8000) => {
+        let timeoutId;
+        const timeoutPromise = new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error(`Timeout: ${ms}ms`)), ms);
+        });
+        return Promise.race([
+          fetch(url, options),
+          timeoutPromise
+        ]).finally(() => {
+          if (timeoutId) clearTimeout(timeoutId);
+        });
+      };
+
       try {
         const token = await AsyncStorage.getItem('userToken');
         if (token) {
-          // Fetch real user data from API
-          const res = await fetch(`${API_URL}/auth/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (res.ok) {
-            const user = await res.json();
+          const res = await fetchWithTimeout(
+            `${API_URL}/auth/me`,
+            {
+              headers: { 'Authorization': `Bearer ${token}` }
+            },
+            8000
+          );
+
+          if (res && res.ok) {
+            let user = null;
+            try {
+              user = await res.json();
+            } catch (e) {
+              // Si el backend regresó HTML/otra cosa, no rompemos el flujo.
+              console.warn('Failed to parse /auth/me JSON');
+            }
+
             setUserToken(token);
             setUserData(user);
             setCurrentScreen('Dashboard');
           } else {
-            // Token might be invalid/expired
             await AsyncStorage.removeItem('userToken');
           }
         }
-        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Pequeña espera para dejar respirar al UI, sin congelar por red.
+        await new Promise(resolve => setTimeout(resolve, 150));
       } catch (e) {
-        console.warn(e);
+        console.warn('prepare() error:', e?.message || e);
       } finally {
         setAppIsReady(true);
       }

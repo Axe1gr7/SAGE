@@ -17,6 +17,22 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+limiter = Limiter(key_func=get_remote_address)
+
+from fastapi.security.api_key import APIKeyHeader
+from fastapi import Security
+api_key_scheme = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+def get_api_key(api_key_header: str = Security(api_key_scheme)):
+    if api_key_header == "SAGE_SECRET_API_KEY_2026":
+        return api_key_header
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN, detail="No se pudo validar la API KEY"
+    )
+
+
 # --- FUNCIONES DE ENCRIPTACIÓN NATIVAS (Sin librerías externas) ---
 def verify_password(plain_password: str, hashed_password: str):
     # Encriptamos la contraseña ingresada y la comparamos con la guardada
